@@ -1,0 +1,10 @@
+-- IDEA DUMP --
+
+IDEA #1 (DEVIN)
+Issue: Accessible ML tool for people w/o ML background
+Target Audience: Business Analyst, Data Analyst, Domain Experts
+
+A web application that consist of the following components:
+  1. ML Store (like an appstore but for ML models) - place where people can upload and download trained ML models
+  2. ML Lab - place where people can create and train their own ML models as well as deploy/test other people ML models from the ML Store
+  3. Dashboard tools - place where people can analyze data and generate whatever statistics/graphs they want (mainly for data analytics)
