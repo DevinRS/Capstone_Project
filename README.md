@@ -7,7 +7,7 @@ Group Members: Devin, Hubert, Nick, Cody, Tristan
 Tech Stack
 ![image](https://github.com/DevinRS/Capstone_Project/assets/103350414/1613a28c-395b-476b-8a3e-e88007b30500)
 
-<h2>Webpage 1 Design</h2>
+<h3>Webpage 1 Design</h3>
 Tab 1
 
 
