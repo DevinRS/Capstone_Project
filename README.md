@@ -8,6 +8,7 @@ Group Members: Devin, Hubert, Nick, Cody, Tristan
 
 ![image](https://github.com/DevinRS/Capstone_Project/assets/103350414/1613a28c-395b-476b-8a3e-e88007b30500)
 
+
 <h3>Webpage 1 Design</h3>
 Tab 1
 ![image](https://github.com/DevinRS/Capstone_Project/assets/103350414/3024f96e-c1ba-4a78-a47a-24d00eb8aace)
