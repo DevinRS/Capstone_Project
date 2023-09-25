@@ -2,7 +2,7 @@
 EECS581 Capstone Project
 
 Group Members: Devin, Hubert, Nick, Cody, Tristan
-# Sprint 1 Artifacts 
+# Sprint 1 Deliverables 
 
 <h3>Tech Stack</h3>
 
