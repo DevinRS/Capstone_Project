@@ -136,7 +136,7 @@ st.set_page_config(
 # ----
 
 selected = option_menu(
-    menu_title= "ML Sandbox",
+    menu_title= "Pathfinder",
     options=['Upload', 'Graph Generator', 'Saved Graphs'],
     orientation="horizontal"
 )
