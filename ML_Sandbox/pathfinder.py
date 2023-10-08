@@ -1,7 +1,7 @@
 import streamlit as st
 import plotly.express as px
 import pandas as pd
-
+from streamlit_option_menu import option_menu
 # ----
 # Definition and Globals
 # ----
@@ -132,14 +132,14 @@ st.set_page_config(
 )
 
 # ----
-# Sidebar
+# Topbar
 # ----
-with st.sidebar:
-    st.header('Make Your Graphs!')
-    upload_file_button = st.button('1. Upload File', use_container_width=True)
-    generate_graph_button = st.button('2. Generate Graph', use_container_width=True, disabled=True)
-    saved_graph_button = st.button('3. Saved Graph', use_container_width=True, disabled=True)
 
+selected = option_menu(
+    menu_title= "ML Sandbox",
+    options=['Upload', 'Graph Generator', 'Saved Graphs'],
+    orientation="horizontal"
+)
 # ----
 # Body
 # ----
@@ -171,3 +171,20 @@ hideCheckBox = hide_me()
 if(hideCheckBox == False):
     tutorial_section()
     
+
+
+
+
+# ----
+# Sidebar
+# ----
+#with st.sidebar:
+#    st.header('Make Your Graphs!')
+#    upload_file_button = st.link_button('1. Upload File', use_container_width=True, url='/#upload-file')
+    #if input_file is not None:
+    #    generate_graph_button = st.link_button('2. Generate Graph', use_container_width=True, disabled=False, url='#generate-graph')    
+    #else:
+    #    generate_graph_button = st.link_button('2. Generate Graph', use_container_width=True, disabled=True, url="/#generate-graph")
+    #saved_graph_button = st.button('3. Saved Graph', use_container_width=True, disabled=True)
+
+
