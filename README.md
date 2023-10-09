@@ -21,7 +21,7 @@ Tab 3
 ![image](https://github.com/DevinRS/Capstone_Project/assets/103350414/3eeb1a9f-47ed-440a-a911-5d9727f3c5f0)
 
 
-<h3>Webpage 3 Design/h3>
+<h3>Webpage 3 Design</h3>
 
 ![image](https://github.com/DevinRS/Capstone_Project/assets/103350414/b38c87bd-8e6e-4dce-83c0-ab215e726680)
 
