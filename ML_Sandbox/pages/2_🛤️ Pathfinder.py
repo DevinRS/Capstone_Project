@@ -81,44 +81,41 @@ def saved_graph():
 
 
 # Tutorial Section Components
-def hide_me():
-    selection = st.checkbox('Hide Me', value=False)
-
-    return selection
 
 def tutorial_section():
-    st.header('New to Graph?')
-    st.write('''
-"Welcome to the world of graphs, where numbers come to life in colorful, mesmerizing displays! 🚀✨ If you're scratching your head, wondering what on earth a graph is, fear not! We're here to sprinkle a little graphy magic into your life. No prior graph knowledge needed – just bring your curiosity and data, and we'll transform it into captivating visual stories. Get ready to 'wow' your friends and colleagues with your newfound graph superpowers. Ready? Let's dive in!"
-''')
-    st.subheader('What would you like your graph to highlight in your data?')
-    with st.expander('Visualize Data Changes Over Time ⏳'):
+    with st.expander('Tutorial'):
+        st.header('New to Graph?')
         st.write('''
-Ready to turn your data into a time-traveling adventure? Strap in, because we're about to visualize how things evolve over time. Choose a graph that suits your data's journey!
-                 
-We recommend the following:
-1. Line Chart 📈
-2. Area Chart 🌄
-3. Scatter Plot 🌟
-''')
-    with st.expander('Compare Categories or Groups 📊'):
+    "Welcome to the world of graphs, where numbers come to life in colorful, mesmerizing displays! 🚀✨ If you're scratching your head, wondering what on earth a graph is, fear not! We're here to sprinkle a little graphy magic into your life. No prior graph knowledge needed – just bring your curiosity and data, and we'll transform it into captivating visual stories. Get ready to 'wow' your friends and colleagues with your newfound graph superpowers. Ready? Let's dive in!"
+    ''')
+        st.subheader('What would you like your graph to highlight in your data?')
+        st.subheader('Visualize Data Changes Over Time ⏳')
         st.write('''
-Time to become the detective of data! Uncover hidden insights by comparing different categories or groups within your data. Select the ideal graph to reveal the story of your data.
-                 
-We recommend the following:
-1. Bar Chart 📊
-2. Histogram 📚
-3. Stacked Column Chart 📉
-''')
-    with st.expander('Show Proportions or Percentages 📈'):
+    Ready to turn your data into a time-traveling adventure? Strap in, because we're about to visualize how things evolve over time. Choose a graph that suits your data's journey!
+                    
+    We recommend the following:
+    1. Line Chart 📈
+    2. Area Chart 🌄
+    3. Scatter Plot 🌟
+    ''')
+        st.subheader('Compare Categories or Groups 📊')
         st.write('''
-Want to slice and dice your data into delicious proportions? Dive into the world of percentages and proportions with these graph options!
-                 
-We recommend the following:
-1. Pie Chart 🥧
-2. Donut Chart 🍩
-3. 100% Stacked Area Chart 📊
-''')
+    Time to become the detective of data! Uncover hidden insights by comparing different categories or groups within your data. Select the ideal graph to reveal the story of your data.
+                    
+    We recommend the following:
+    1. Bar Chart 📊
+    2. Histogram 📚
+    3. Stacked Column Chart 📉
+    ''')
+        st.subheader('Show Proportions or Percentages 📈')
+        st.write('''
+    Want to slice and dice your data into delicious proportions? Dive into the world of percentages and proportions with these graph options!
+                    
+    We recommend the following:
+    1. Pie Chart 🥧
+    2. Donut Chart 🍩
+    3. 100% Stacked Area Chart 📊
+    ''')
 
 # ----
 # Page Config
@@ -134,12 +131,12 @@ st.set_page_config(
 # ----
 # Topbar
 # ----
-
 selected = option_menu(
     menu_title= "Pathfinder",
     options=['Upload', 'Graph Generator', 'Saved Graphs'],
     orientation="horizontal"
 )
+
 # ----
 # Body
 # ----
@@ -165,11 +162,7 @@ if input_file is not None:
 
 #3. Saved Graph Section
 saved_graph()
-
-#4. Tutorial Section
-hideCheckBox = hide_me()
-if(hideCheckBox == False):
-    tutorial_section()
+tutorial_section()
     
 
 
