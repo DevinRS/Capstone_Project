@@ -5,7 +5,7 @@ Group Members: Devin, Hubert, Nick, Cody, Tristan
 # Sprint 2 Deliverables 
 
 For this sprint, the codebase is available in /ML_Sandbox directory.
-The full website can be accessed ![here](https://mlsandbox.streamlit.app/)
+The full website can be accessed [here](https://mlsandbox.streamlit.app/)
 
 <h3>Webpage 2 Design</h3>
 
