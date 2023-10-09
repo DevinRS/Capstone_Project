@@ -18,7 +18,7 @@ st.set_page_config(
 # Topbar
 # ----
 selected = option_menu(
-    menu_title= "Pathfinder",
+    menu_title= "Autodidact",
     options=['Upload', 'Modify Model', 'Run Model'],
     orientation="horizontal"
 )
