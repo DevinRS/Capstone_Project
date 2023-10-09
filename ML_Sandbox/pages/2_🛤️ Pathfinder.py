@@ -5,10 +5,6 @@ from streamlit_option_menu import option_menu
 # ----
 # Definition and Globals
 # ----
-
-# Globals
-file_list = []
-
 # Session States
 if 'input_dataframe_page1' not in st.session_state:
     st.session_state['input_dataframe_page1'] = pd.DataFrame()
