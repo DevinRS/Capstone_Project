@@ -167,7 +167,6 @@ if(selected == 'Upload'):
 
 # 2. Graph Section
 if(selected == 'Graph Generator'):
-    st.session_state
     if(st.session_state['input_dataframe_page1'].empty == True):
         st.error('Error: Input file not found!')
     else:
