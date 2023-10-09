@@ -1,7 +1,7 @@
 import streamlit as st
 from PIL import Image
 
-img = Image.open("first.png")
+img = Image.open("ML_Sandbox/first.png")
 with st.sidebar:
   st.image(img)
 
