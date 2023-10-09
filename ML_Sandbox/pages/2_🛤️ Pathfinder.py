@@ -6,6 +6,17 @@ from streamlit_option_menu import option_menu
 # Definition and Globals
 # ----
 
+# Globals
+file_list = []
+
+# Session States
+if 'input_dataframe_page1' not in st.session_state:
+    st.session_state['input_dataframe_page1'] = pd.DataFrame()
+
+if 'last_input' not in st.session_state:
+    st.session_state['last_input'] = None
+
+
 # Graph Selector
 def select_graph():
     selection = st.selectbox(label='Select: ', options=['Line Graph', 'Pie Chart', 'Bar Graph', 'Scatter Plot'])
@@ -141,43 +152,40 @@ selected = option_menu(
 # Body
 # ----
 # 1. Input Section
-st.header('Upload File')
-input_file = st.file_uploader('Choose a CSV file', type='csv', key='input_file')
-df = None
+if(selected == 'Upload'):
+    st.header('Upload File')
+    input_file = st.file_uploader('Choose a CSV file', type='csv', key='input_file')
+
+    if input_file is not None:
+        df = pd.read_csv(input_file)
+        st.session_state['input_dataframe_page1'] = df
+        st.session_state['last_input'] = input_file.name
+
+    if st.session_state['last_input'] is not None:
+        st.write('Last Uploaded File:')
+        st.info(st.session_state["last_input"])
 
 # 2. Graph Section
-if input_file is not None:
-    st.header('Generate Graph')
-    df = pd.read_csv(input_file)
-    st.write(df)
-    selection = select_graph()
-    if(selection == 'Line Graph'):
-        line_graph(df)
-    elif(selection == 'Pie Chart'):
-        pie_chart(df)
-    elif(selection == 'Bar Graph'):
-        bar_graph(df)
-    elif(selection == 'Scatter Plot'):
-        scatter_plot(df)
+if(selected == 'Graph Generator'):
+    st.session_state
+    if(st.session_state['input_dataframe_page1'].empty == True):
+        st.error('Error: Input file not found!')
+    else:
+        st.header('Generate Graph')
+        df = st.session_state['input_dataframe_page1']
+        st.write(df)
+        selection = select_graph()
+        if(selection == 'Line Graph'):
+            line_graph(df)
+        elif(selection == 'Pie Chart'):
+            pie_chart(df)
+        elif(selection == 'Bar Graph'):
+            bar_graph(df)
+        elif(selection == 'Scatter Plot'):
+            scatter_plot(df)
 
 #3. Saved Graph Section
 saved_graph()
 tutorial_section()
-    
-
-
-
-
-# ----
-# Sidebar
-# ----
-#with st.sidebar:
-#    st.header('Make Your Graphs!')
-#    upload_file_button = st.link_button('1. Upload File', use_container_width=True, url='/#upload-file')
-    #if input_file is not None:
-    #    generate_graph_button = st.link_button('2. Generate Graph', use_container_width=True, disabled=False, url='#generate-graph')    
-    #else:
-    #    generate_graph_button = st.link_button('2. Generate Graph', use_container_width=True, disabled=True, url="/#generate-graph")
-    #saved_graph_button = st.button('3. Saved Graph', use_container_width=True, disabled=True)
 
 
