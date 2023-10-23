@@ -150,9 +150,6 @@ if selected == 'Train Model':
                             st.dataframe(compare_models_df)
                             st.info('Model Interpretation')
                             st.write(pycaret_classification.interpret_model(best_model, plot='msa'))
-                            pycaret_classification.save_model(best_model, 'best_model')
-                        with open('best_model.pkl', 'rb') as f:
-                            st.download_button('Download Model', f, file_name='model.pkl')
                     elif problem_type == 'Regression':
                         with st.spinner('Running AutoML...'):
                             if st.session_state['ml_settings_regression'] is None:
@@ -177,9 +174,6 @@ if selected == 'Train Model':
                             st.dataframe(compare_models_df)
                             st.info('Model Interpretation')
                             st.write(pycaret_regression.interpret_model(best_model, plot='msa'))
-                            pycaret_regression.save_model(best_model, 'best_model')
-                        with open('best_model.pkl', 'rb') as f:
-                            st.download_button('Download Model', f, file_name='model.pkl')
                     elif problem_type == 'Clustering':
                         with st.spinner('Running AutoML...'):
                             pycaret_clustering.setup(df, verbose=False)
@@ -190,9 +184,6 @@ if selected == 'Train Model':
                             assign_model_df = pycaret_clustering.assign_model(best_model)
                             st.info('Cluster Assignments')
                             st.dataframe(assign_model_df)
-                            pycaret_clustering.save_model(best_model, 'best_model')
-                        with open('best_model.pkl', 'rb') as f:
-                            st.download_button('Download Model', f, file_name='model.pkl')
 
 
 if selected == 'Run Model':
