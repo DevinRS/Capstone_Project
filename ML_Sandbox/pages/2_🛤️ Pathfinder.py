@@ -74,13 +74,119 @@ def line_graph(df: pd.DataFrame):
 
 # TO IMPLEMENT
 def pie_chart(df: pd.DataFrame):
-    return
+    st.write('---')
+    st.subheader(' Pie Chart Editor')
+    col_names = df.columns.tolist()
+    col_names.append('Auto')
+    fig = px.pie(df, values=col_names)
+
+    st.plotly_chart(fig, use_container_width=True)
+
+    st.write('---')
 
 def bar_graph(df: pd.DataFrame):
-    return
+    st.write('---')
+    st.subheader('Bar Graph Editor')
+    col_names = df.columns.tolist()
+    col_names.append('Auto')
+    col1, col2 = st.columns((1,2))
+    with col1:
+        col3, col4 = st.columns(2)
+        with col3:
+            X_val = st.selectbox('Select X-axis Variable', col_names)
+            col_names2 = [item for item in col_names if item != X_val]
+            X_label = st.text_input('Enter X-axis Label', value=X_val)
+        with col4:
+            Y_val = st.selectbox('Select Y-axis Variable', col_names2)
+            Y_label = st.text_input('Enter Y-axis Label', value=Y_val)
+        title = st.text_input('Enter Graph Title', value='Graph')
+        col5, col6, col7 = st.columns(3)
+        with col5:
+            bar_color = st.color_picker('Bar Color', value='#e18a6d')
+        with col6:
+            label_font_color = st.color_picker('Label Color', value='#FFFFFF')
+        with col7:
+            tick_font_color = st.color_picker('Tick Color', value='#FFFFFF')
+        transparent_bg = st.checkbox('Transparent Background', value=False)
+    with col2:
+        if X_val != 'Auto' and Y_val != 'Auto':
+            fig = px.bar(df, x=X_val, y=Y_val, title=title, labels={X_val: X_label, Y_val: Y_label})
+        elif X_val == 'Auto' and Y_val != 'Auto':
+            fig = px.bar(df, y=Y_val, title=title, labels={X_val: X_label, Y_val: Y_label})
+        elif X_val != 'Auto' and Y_val == 'Auto':
+            fig = px.bar(df, x=X_val, title=title, labels={X_val: X_label, Y_val: Y_label})
+        else:
+            st.write("Please select at least one axis variable.")
+
+        # Custom color
+        fig.update_traces(marker=dict(color=bar_color),
+                  selector=dict(type="bar"))
+        if transparent_bg:
+            fig.update_layout({'plot_bgcolor': 'rgba(0,0,0,0)', 'paper_bgcolor': 'rgba(0,0,0,0)'})
+        # Custom color for labels
+        fig.update_layout(title_font=dict(color=label_font_color))
+        fig.update_xaxes(title_text=X_label, title_font=dict(color=label_font_color))
+        fig.update_yaxes(title_text=Y_label, title_font=dict(color=label_font_color))
+        # Custom color for x and y-axis values
+        fig.update_xaxes(tickfont=dict(color=tick_font_color))
+        fig.update_yaxes(tickfont=dict(color=tick_font_color))
+
+        st.plotly_chart(fig, use_container_width=True)
+
+    st.write('---')
 
 def scatter_plot(df: pd.DataFrame):
-    return
+    st.write('---')
+    st.subheader('Scatter Plot Editor')
+    col_names = df.columns.tolist()
+    col_names.append('Auto')
+    col1, col2 = st.columns((1,2))
+    with col1:
+        col3, col4 = st.columns(2)
+        with col3:
+            X_val = st.selectbox('Select X-axis Variable', col_names)
+            col_names2 = [item for item in col_names if item != X_val]
+            X_label = st.text_input('Enter X-axis Label', value=X_val)
+        with col4:
+            Y_val = st.selectbox('Select Y-axis Variable', col_names2)
+            Y_label = st.text_input('Enter Y-axis Label', value=Y_val)
+        title = st.text_input('Enter Graph Title', value='Graph')
+        col5, col6, col7 = st.columns(3)
+        with col5:
+            plot_color = st.color_picker('Plot Color', value='#e18a6d')
+        with col6:
+            label_font_color = st.color_picker('Label Color', value='#FFFFFF')
+        with col7:
+            tick_font_color = st.color_picker('Tick Color', value='#FFFFFF')
+        transparent_bg = st.checkbox('Transparent Background', value=False)
+
+    with col2:
+        if X_val != 'Auto' and Y_val != 'Auto':
+            fig = px.scatter(df, x=X_val, y=Y_val, title=title, labels={X_val: X_label, Y_val: Y_label})
+        elif X_val == 'Auto' and Y_val != 'Auto':
+            fig = px.scatter(df, y=Y_val, title=title, labels={X_val: X_label, Y_val: Y_label})
+        elif X_val != 'Auto' and Y_val == 'Auto':
+            fig = px.scatter(df, x=X_val, title=title, labels={X_val: X_label, Y_val: Y_label})
+        else:
+            st.write("Please select at least one axis variable.")
+        
+        # Custom color
+        fig.update_traces(marker=dict(color=plot_color),
+                  selector=dict(type="scatter"))
+        if transparent_bg:
+            fig.update_layout({'plot_bgcolor': 'rgba(0,0,0,0)', 'paper_bgcolor': 'rgba(0,0,0,0)'})
+        # Custom color for labels
+        fig.update_layout(title_font=dict(color=label_font_color))
+        fig.update_xaxes(title_text=X_label, title_font=dict(color=label_font_color))
+        fig.update_yaxes(title_text=Y_label, title_font=dict(color=label_font_color))
+        # Custom color for x and y-axis values
+        fig.update_xaxes(tickfont=dict(color=tick_font_color))
+        fig.update_yaxes(tickfont=dict(color=tick_font_color))
+
+        st.plotly_chart(fig, use_container_width=True)
+
+    st.write('---')
+
 
 # Saved Graph Section Components
 def saved_graph():
