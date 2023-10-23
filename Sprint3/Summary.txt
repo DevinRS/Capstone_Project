@@ -1,1 +1,7 @@
+Sprint 3:
 
+Nick: Implemented webpage #3
+Hubert: Implemented webpage #3
+Cody: Implemented webpage #1
+Devin: Implemented webpage #2
+Tristan: Implemented webpage #2
