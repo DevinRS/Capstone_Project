@@ -188,8 +188,6 @@ if selected == 'Train Model':
 
 if selected == 'Run Model':
     st.header('Run Model')
-    model = pycaret_classification.load_model('best_model')
-    st.write(model)
 
 
 # ----
