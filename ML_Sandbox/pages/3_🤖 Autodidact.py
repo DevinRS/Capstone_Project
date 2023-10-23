@@ -2,6 +2,14 @@ import streamlit as st
 import pandas as pd
 from streamlit_option_menu import option_menu
 
+from ydata_profiling import ProfileReport
+from streamlit_pandas_profiling import st_profile_report
+import pycaret.classification as pycaret_classification
+import pycaret.regression as pycaret_regression
+import pycaret.clustering as pycaret_clustering
+
+import pickle
+
 # ----
 # Definition and Globals
 # ----
@@ -12,6 +20,24 @@ if 'input_dataframe_page2' not in st.session_state:
 if 'last_input_2' not in st.session_state:
     st.session_state['last_input_2'] = None
 
+if 'profile_report' not in st.session_state:
+    st.session_state['profile_report'] = None
+
+# Classification
+if 'ml_settings_classification' not in st.session_state:
+    st.session_state['ml_settings_classification'] = None
+if 'best_model_classification' not in st.session_state:
+    st.session_state['best_model_classification'] = None
+if 'compare_models_classification' not in st.session_state:
+    st.session_state['compare_models_classification'] = None
+
+# Regression
+if 'ml_settings_regression' not in st.session_state:
+    st.session_state['ml_settings_regression'] = None
+if 'best_model_regression' not in st.session_state:
+    st.session_state['best_model_regression'] = None
+if 'compare_models_regression' not in st.session_state:
+    st.session_state['compare_models_regression'] = None
 
 
 # ----
@@ -37,8 +63,26 @@ selected = option_menu(
 # ----
 # Body
 # ----
-# 1. Input Section
+
+# ----
+# Train Model Section
+# ----
 if selected == 'Train Model':
+    # 1. Select Problem Type
+    st.header('Select Problem Type')
+    problem_type = st.radio(
+        'What problem are you trying to solve?',
+        ('Classification', 'Regression', 'Clustering')
+    )
+
+    # 2. Select Auto/Manual Mode
+    st.header('Select Mode')
+    mode = st.radio(
+        'Do you want to use AutoML or Manual Mode?',
+        ('AutoML', 'Manual Mode')
+    )
+
+    # 3. Input Section
     st.header('Upload File')
     input_file = st.file_uploader('Choose a CSV file', type='csv', key='input_file')
     
@@ -46,27 +90,123 @@ if selected == 'Train Model':
         df = pd.read_csv(input_file)
         st.session_state['input_dataframe_page2'] = df
         st.session_state['last_input_2'] = input_file.name
+        st.session_state['profile_report'] = None
+        st.session_state['ml_settings_classification'] = None
+        st.session_state['best_model_classification'] = None
+        st.session_state['compare_models_classification'] = None
+        st.session_state['ml_settings_regression'] = None
+        st.session_state['best_model_regression'] = None
+        st.session_state['compare_models_regression'] = None
 
     if st.session_state['last_input_2'] is not None:
         st.write('Last Uploaded File:')
         st.info(st.session_state["last_input_2"])
 
+    # 4. Data Profiling and Model Training
+    if st.session_state['input_dataframe_page2'].empty == False:
         df = st.session_state['input_dataframe_page2']
-        st.subheader('1. Data Preview')
         st.write(df)
 
-        st.subheader('2. Train Model')
-        manual_mode = st.checkbox('Manual Mode')
+        st.write('''---''')
+        # AutoML
+        if mode == 'AutoML':
+            st.header('AutoML')
+            data_profiling_cb = st.checkbox('Data Profiling', value=False, help='Generate a report on the dataset')
+            train_model_cb = st.checkbox('Train Model', value=False, help='Train a model on the dataset')
+            if problem_type == 'Classification' or problem_type == 'Regression':
+                target = st.selectbox('Select Target Variable', df.columns)
+            elif problem_type == 'Clustering':
+                target = st.selectbox('Select Clustering Models', ['kmeans', 'ap', 'meanshift', 'sc', 'hclust', 'dbscan', 'optics', 'birch', 'kmodes'], help='kmeans = K-Means Clustering, ap = Affinity Propagation, meanshift = Mean Shift Clustering, sc = Spectral Clustering, hclust = Agglomerative Clustering, dbscan = Density-Based Spatial Clustering, optics = OPTICS Clustering, birch = Birch Clustering, kmodes = K-Modes Clustering')
+            if st.button('Run AutoML'):
+                if data_profiling_cb:
+                    if st.session_state['profile_report'] is None:
+                        profile_report = ProfileReport(df)
+                        st.session_state['profile_report'] = profile_report
+                    else:
+                        profile_report = st.session_state['profile_report']
+                    st.info('Data Profiling')
+                    st_profile_report(profile_report)
 
-        st.subheader('3. Download Model')
-    
+                if train_model_cb:
+                    if problem_type == 'Classification':
+                        with st.spinner('Running AutoML...'):
+                            if st.session_state['ml_settings_classification'] is None:
+                                pycaret_classification.setup(df, target=target, verbose=False)
+                                setup_df = pycaret_classification.pull()
+                                st.session_state['ml_settings_classification'] = setup_df
+                            else:
+                                setup_df = st.session_state['ml_settings_classification']
+                            st.info('ML Settings')
+                            st.dataframe(setup_df)
+                            if st.session_state['best_model_classification'] is None:
+                                best_model = pycaret_classification.compare_models()
+                                st.session_state['best_model_classification'] = best_model
+                            else:
+                                best_model = st.session_state['best_model_classification']
+                            if st.session_state['compare_models_classification'] is None:
+                                compare_models_df = pycaret_classification.pull()
+                                st.session_state['compare_models_classification'] = compare_models_df
+                            else:
+                                compare_models_df = st.session_state['compare_models_classification']
+                            st.info('Model Comparison')
+                            st.dataframe(compare_models_df)
+                            st.info('Model Interpretation')
+                            st.write(pycaret_classification.interpret_model(best_model, plot='msa'))
+                            pycaret_classification.save_model(best_model, 'best_model')
+                        with open('best_model.pkl', 'rb') as f:
+                            st.download_button('Download Model', f, file_name='model.pkl')
+                    elif problem_type == 'Regression':
+                        with st.spinner('Running AutoML...'):
+                            if st.session_state['ml_settings_regression'] is None:
+                                pycaret_regression.setup(df, target=target, verbose=False)
+                                setup_df = pycaret_regression.pull()
+                                st.session_state['ml_settings_regression'] = setup_df
+                            else:
+                                setup_df = st.session_state['ml_settings_regression']
+                            st.info('ML Settings')
+                            st.dataframe(setup_df)
+                            if st.session_state['best_model_regression'] is None:
+                                best_model = pycaret_regression.compare_models()
+                                st.session_state['best_model_regression'] = best_model
+                            else:
+                                best_model = st.session_state['best_model_regression']
+                            if st.session_state['compare_models_regression'] is None:
+                                compare_models_df = pycaret_regression.pull()
+                                st.session_state['compare_models_regression'] = compare_models_df
+                            else:
+                                compare_models_df = st.session_state['compare_models_regression']
+                            st.info('Model Comparison')
+                            st.dataframe(compare_models_df)
+                            st.info('Model Interpretation')
+                            st.write(pycaret_regression.interpret_model(best_model, plot='msa'))
+                            pycaret_regression.save_model(best_model, 'best_model')
+                        with open('best_model.pkl', 'rb') as f:
+                            st.download_button('Download Model', f, file_name='model.pkl')
+                    elif problem_type == 'Clustering':
+                        with st.spinner('Running AutoML...'):
+                            pycaret_clustering.setup(df, verbose=False)
+                            setup_df = pycaret_clustering.pull()
+                            st.info('ML Settings')
+                            st.dataframe(setup_df)
+                            best_model = pycaret_clustering.create_model(target)
+                            assign_model_df = pycaret_clustering.assign_model(best_model)
+                            st.info('Cluster Assignments')
+                            st.dataframe(assign_model_df)
+                            pycaret_clustering.save_model(best_model, 'best_model')
+                        with open('best_model.pkl', 'rb') as f:
+                            st.download_button('Download Model', f, file_name='model.pkl')
+
 
 if selected == 'Run Model':
     st.header('Run Model')
+    model = pycaret_classification.load_model('best_model')
+    st.write(model)
+
 
 # ----
 # Tutorial Section
 # ----
+st.write('''---''')
 with st.expander(label='Tutorial'):
     st.header('Not familiar with machine learning?')
     st.write('''
@@ -104,15 +244,6 @@ Some common clustering algorithms are:
 1. K-Means Clustering
 2. Hierarchical Clustering
 3. DBSCAN
-''')
-    st.subheader('Dimensionality Reduction 🧮')  
-    st.write('''
-Dimensionality reduction is a type of unsupervised learning where the machine learns from the data input given to it and then uses this learning to reduce the number of variables in the data. E.g. Reducing the number of variables in a dataset to make it easier to analyze.
-             
-Some common dimensionality reduction algorithms are:
-1. Principal Component Analysis (PCA)
-2. Linear Discriminant Analysis (LDA)
-3. t-distributed Stochastic Neighbor Embedding (t-SNE)
 ''')
     st.subheader('Running a Model')
     st.write('''
