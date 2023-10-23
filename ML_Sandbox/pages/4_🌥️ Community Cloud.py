@@ -1,7 +1,4 @@
-from fileinput import filename
 import string
-from tkinter.font import BOLD
-from turtle import down
 import streamlit as st
 from streamlit_option_menu import option_menu
 import pickle
