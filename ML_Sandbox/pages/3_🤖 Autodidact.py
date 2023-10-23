@@ -8,8 +8,6 @@ import pycaret.classification as pycaret_classification
 import pycaret.regression as pycaret_regression
 import pycaret.clustering as pycaret_clustering
 
-import pickle
-
 # ----
 # Definition and Globals
 # ----
