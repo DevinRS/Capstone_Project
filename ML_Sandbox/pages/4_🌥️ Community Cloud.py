@@ -9,38 +9,6 @@ from sqlalchemy.types import PickleType
 import datetime
 
 # ----
-# Defining the database objects
-# ----
-Base = declarative_base()
-class Models(Base):
-    __tablename__ = "models"
-    MLname = Column("name", String, primary_key=True)
-    description = Column("description", String)
-    # rating = Column("rating", Integer)
-    # downloads = Column("downloads", Integer)
-    item = Column("item", PickleType)
-    # uploadTime = Column("time", DateTime, default=datetime.datetime.utcnow)
-
-    def __init__ (self, MLname, description, item): #, rating, downloads, uploadTime):
-        self.MLname = MLname
-        self.description = description
-        # self.rating = rating
-        # self.downloads = downloads
-        self.item = item
-        # self.uploadTime = uploadTime
-    
-    def __repr__ (self):
-        return f"{self.MLname}, {self.description}, {self.item.name}"
-
-
-engine = create_engine("sqlite:///file_uploads.db")
-Base.metadata.create_all(bind=engine)
-
-Session = sessionmaker(bind=engine)
-session = Session()
-
-
-# ----
 # Page Config
 # ----
 st.set_page_config(
@@ -51,49 +19,352 @@ st.set_page_config(
     menu_items=None
 )
 
-
-
 # ----
-# Topbar
+# Defining the database objects
 # ----
-selected = option_menu(
-    menu_title= "Community Cloud",
-    options=['Create Post', 'Rating', 'Used', 'Trending', 'Alphabetical'],
-    orientation="horizontal",
-)
+Base = declarative_base()
+class Models(Base):
+    #set table name and columns
+    __tablename__ = "models"
+    MLname = Column("name", String, primary_key=True)
+    description = Column("description", String)
+    longDescription = Column("longDesc", String)
+    # downloads = Column("downloads", Integer)
+    item = Column("item", PickleType)
+    rating = Column("rating", Integer)
+    uploadTime = Column("date", String)
 
-# ----
-# Body
-# ----
-if(selected == 'Create Post'):
-    st.header('Create a Post!')
-    with st.form(key="uploadModelForm", clear_on_submit=True):
-        modelName = st.text_input(label='Enter the machine learning model name')
-        modelDescription = st.text_area(label='Post Body')
-        modelItem = st.file_uploader(label='Have a Model? Upload It Here 😊', type = ['pkl', 'pickle'], key = 'model_file')
-        uploadButton = st.form_submit_button(label='Upload Your Post')
-        # modelTime = datetime.datetime.utcnow
-        if (uploadButton == True):
-            model = Models(modelName, modelDescription, modelItem) #modelTime) 
-            session.add(model)
-            session.commit()
-            st.success(f'Model "{modelItem.name}" has been successfully uploaded!')
-            st.rerun()
-
-        results = session.query(Models).all()
-    st.write(results)
+    def __init__ (self, MLname, description, longDescription, item, rating, uploadTime): #, rating, downloads, uploadTime):
+        self.MLname = MLname
+        self.description = description
+        self.longDescription = longDescription
+        # self.downloads = downloads
+        self.item = item
+        self.rating = rating
+        self.uploadTime = uploadTime
     
-
-if(selected == 'Rating'):
-    st.header('This will be the area where user see other\'s post, sorted by rating')
-
-if(selected == 'Used'):
-    st.header('This will be the area where user see other\'s post, sorted by used')
- 
-if(selected == 'Trending'):
-    st.header('This will be the area where user see other\'s post, sorted by Trending')
-
-if(selected == 'Alphabetical'):
-    st.header('This will be the area where user see other\'s post, sorted by Alphabetical')
+    def __repr__ (self):
+        return f"{self.MLname}, {self.description}, {self.longDescription}, {self.item.name}, {self.rating}, {self.uploadTime}"
 
 
+engine = create_engine("sqlite:///file_uploads.db")
+Base.metadata.create_all(bind=engine)
+
+Session = sessionmaker(bind=engine)
+session = Session()
+
+# ----
+# Title of the Page
+# ----
+
+title_css = """
+<style>
+    .page-title {
+        font-size: 50px;
+        font-weight: bold;
+        color: black;
+        text-align: center;
+        margin-top: 20px;
+    }
+</style>
+"""
+
+
+st.markdown(title_css, unsafe_allow_html=True)
+
+
+st.markdown('<p class="page-title">Community Cloud</p>', unsafe_allow_html=True)
+st.divider()
+st.header('Create a Post', anchor=None)
+
+
+# ----
+# Create Post
+# ----
+
+with st.form(key="uploadModelForm", clear_on_submit=True):
+    modelName = st.text_input(label='Model Name:')
+    modelDescription = st.text_area(label='Short Description of Model', 
+                                    placeholder='e.g.  probabilistic machine learning algorithm')
+    modelLongDesc = st.text_area(label='Detailed Description of Model', 
+                                 placeholder='e.g. Naïve Bayes is a probabilistic machine learning algorithm used for many classification functions and is based on the Bayes theorem. Gaussian Naïve Bayes is the extension of naïve Bayes. While other functions are used to estimate data distribution, Gaussian or normal distribution is the simplest to implement as you will need to calculate the mean and standard deviation for the training data.')
+    modelItem = st.file_uploader(label='Upload Model 😊', type = ['pkl', 'pickle'], key = 'model_file')
+    modelRating = 4
+    uploadButton = st.form_submit_button(label='Upload Your Post')
+    if (uploadButton == True):
+        if (len(modelName) == 0):
+            st.warning('Put something in')
+            st.rerun()
+        modelTime = st.date_input(label='',value=datetime.datetime.now(), format='MM/DD/YYYY')
+        model = Models(modelName, modelDescription, modelLongDesc, modelItem, modelRating, modelTime) 
+        session.add(model)
+        session.commit()
+        st.success(f'Model "{modelItem.name}" has been successfully uploaded!')
+        st.rerun()
+
+
+#creates random ML models
+from faker import Faker
+import os
+fake = Faker()
+
+os.makedirs('pickle_files', exist_ok=True)
+
+createRandomMls = st.button('create random MLs', type='primary')
+if (createRandomMls):
+    
+    for i in range(10):
+        
+        randomName = fake.first_name()
+        randomDesc = fake.text()
+        randomLongDesc = fake.text()
+        randomRating = fake.random_int(min=1, max=5)
+        randomUploadTime = fake.date_time_this_decade()
+
+        random_data = {
+            'name': randomName,
+            'desc': randomDesc,
+            'rating': randomRating
+        }
+
+        pickle_filename=f'pickle_files/random_data_{i}.pkl'
+        with open(pickle_filename, 'wb') as file:
+            pickle.dump(random_data, file)
+
+        with open(pickle_filename, 'rb') as file:
+            loaded_data = pickle.load(file)
+
+        randomModel = Models(randomName, randomDesc, randomLongDesc, loaded_data, randomRating, randomUploadTime)
+        session.add(randomModel)
+        session.commit()
+    st.success('Created 10 random models')
+
+#clears all ML models
+clearModels = st.button('clear Models', key='clearModels', type='primary')
+if (clearModels):
+    session.query(Models).delete()
+    session.commit()
+    st.success('All models have been deleted')
+
+
+
+# ----
+# Filter displays
+# ----
+st.header('Community Posts')
+import base64
+import streamlit.components.v1 as components
+
+
+# change rating from ints to stars
+def ratingToStars(rating):
+    stars = "⭐" * rating
+    return stars
+
+# ----
+# Search Bar
+# ----
+with st.form(key='searchForm', clear_on_submit=True):
+
+    searchQuery = st.text_input(' Search Posts', '', placeholder='🔍 Search Community Posts', )
+
+    results = session.query(Models).all()
+    filteredResults = [model for model in results if searchQuery.lower() in model.MLname.lower()]
+    searchButton = st.form_submit_button(label='search')
+
+    if (searchQuery):
+        if (not filteredResults):
+            st.warning('No matching results found.')
+        else:
+            for model in filteredResults:
+                st.subheader(model.MLname, anchor=False, divider=False)
+                st.write(model.description)
+                MLlongDesc = model.longDescription
+                st.expander('Read More').write(MLlongDesc)
+                col1, col2, col3, col4, col5 = st.columns(5)
+                with col1:
+                    st.caption(model.uploadTime)
+                with col2:
+                    st.caption(ratingToStars(model.rating))
+                
+                with col5:
+                    download_button_label = f"{model.MLname}.pkl"
+                    file_name = f"{model.MLname}.pkl"
+                    binaryData = pickle.dumps(model.item)
+                    binaryDataBytes = bytes(binaryData)
+
+                    button_html = f'''
+                        <style>
+                            .download-button {{
+                                text-decoration: none;
+                                padding: 5px 10px;
+                                border-radius: 50px;
+                                text-align: center;
+                                color: white;
+                                background-color: #ff6e1c;
+                                border: solid 1px #ffda89;
+                                font-family: 'Roboto', sans-serif;
+                                transition: 0.3s;
+                            }}
+                            .download-button:hover {{
+                                background-color: #ffd884;
+                                color: #ff6e1c;
+                                border: solid 1px #ff6e1c;
+                            }}
+                        </style>
+                        <a href="data:application/octet-stream;base64,{base64.b64encode(binaryDataBytes).decode()}"
+                        download="{file_name}" class="download-button">
+                            {download_button_label}
+                        </a>
+                    '''
+                    components.html(button_html, height=50)
+                
+                st.divider()
+
+
+# ----
+# Filtered Results
+# ----
+with st.container():
+    tab1, tab2, tab3 = st.tabs(['Alphabetical', 'Newest', 'Rating'])
+    with tab1:
+        results = session.query(Models).order_by(Models.MLname).all()
+        for model in results:
+            st.subheader(model.MLname, anchor=False, divider=False)
+            st.write(model.description)
+            MLlongDesc = model.longDescription
+            st.expander('Read More').write(MLlongDesc)
+            col1, col2, col3, col4, col5 = st.columns(5)
+            with col1:
+                st.caption(model.uploadTime)
+            with col2:
+                st.caption(ratingToStars(model.rating))
+            
+            with col5:
+                download_button_label = f"{model.MLname}.pkl"
+                file_name = f"{model.MLname}.pkl"
+                binaryData = pickle.dumps(model.item)
+                binaryDataBytes = bytes(binaryData)
+
+                button_html = f'''
+                    <style>
+                        .download-button {{
+                            text-decoration: none;
+                            padding: 5px 10px;
+                            border-radius: 50px;
+                            text-align: center;
+                            color: white;
+                            background-color: #ff6e1c;
+                            border: solid 1px #ffda89;
+                            font-family: 'Roboto', sans-serif;
+                            transition: 0.3s;
+                        }}
+                        .download-button:hover {{
+                            background-color: #ffd884;
+                            color: #ff6e1c;
+                            border: solid 1px #ff6e1c;
+                        }}
+                    </style>
+                    <a href="data:application/octet-stream;base64,{base64.b64encode(binaryDataBytes).decode()}"
+                    download="{file_name}" class="download-button">
+                        {download_button_label}
+                    </a>
+                '''
+                components.html(button_html, height=50)
+            
+            st.divider()
+
+    with tab2:
+        results = session.query(Models).order_by(Models.uploadTime.desc()).all()
+        for model in results:
+            st.subheader(model.MLname, anchor=False, divider=False)
+            st.write(model.description)
+            MLlongDesc = model.longDescription
+            st.expander('Read More').write(MLlongDesc)
+            col1, col2, col3, col4, col5 = st.columns(5)
+            with col1:
+                st.caption(model.uploadTime)
+            with col2:
+                st.caption(ratingToStars(model.rating))
+            
+            with col5:
+                download_button_label = f"{model.MLname}.pkl"
+                file_name = f"{model.MLname}.pkl"
+                binaryData = pickle.dumps(model.item)
+                binaryDataBytes = bytes(binaryData)
+
+                button_html = f'''
+                    <style>
+                        .download-button {{
+                            text-decoration: none;
+                            padding: 5px 10px;
+                            border-radius: 50px;
+                            text-align: center;
+                            color: white;
+                            background-color: #ff6e1c;
+                            border: solid 1px #ffda89;
+                            font-family: 'Roboto', sans-serif;
+                            transition: 0.3s;
+                        }}
+                        .download-button:hover {{
+                            background-color: #ffd884;
+                            color: #ff6e1c;
+                            border: solid 1px #ff6e1c;
+                        }}
+                    </style>
+                    <a href="data:application/octet-stream;base64,{base64.b64encode(binaryDataBytes).decode()}"
+                    download="{file_name}" class="download-button">
+                        {download_button_label}
+                    </a>
+                '''
+                components.html(button_html, height=50)
+            
+            st.divider()
+            
+    with tab3:
+        results = session.query(Models).order_by(Models.rating.desc()).all()
+        for model in results:
+            st.subheader(model.MLname, anchor=False, divider=False)
+            st.write(model.description)
+            MLlongDesc = model.longDescription
+            st.expander('Read More').write(MLlongDesc)
+            col1, col2, col3, col4, col5 = st.columns(5)
+            with col1:
+                st.caption(model.uploadTime)
+            with col2:
+                st.caption(ratingToStars(model.rating))
+            
+            with col5:
+                download_button_label = f"{model.MLname}.pkl"
+                file_name = f"{model.MLname}.pkl"
+                binaryData = pickle.dumps(model.item)
+                binaryDataBytes = bytes(binaryData)
+
+                button_html = f'''
+                    <style>
+                        .download-button {{
+                            text-decoration: none;
+                            padding: 5px 10px;
+                            border-radius: 50px;
+                            text-align: center;
+                            color: white;
+                            background-color: #ff6e1c;
+                            border: solid 1px #ffda89;
+                            font-family: 'Roboto', sans-serif;
+                            transition: 0.3s;
+                        }}
+                        .download-button:hover {{
+                            background-color: #ffd884;
+                            color: #ff6e1c;
+                            border: solid 1px #ff6e1c;
+                        }}
+                    </style>
+                    <a href="data:application/octet-stream;base64,{base64.b64encode(binaryDataBytes).decode()}"
+                    download="{file_name}" class="download-button">
+                        {download_button_label}
+                    </a>
+                '''
+                components.html(button_html, height=50)
+            
+            st.divider()
+        
