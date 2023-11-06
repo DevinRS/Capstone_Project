@@ -4,12 +4,14 @@ EECS581 Capstone Project
 Group Members: Devin, Hubert, Nick, Cody, Tristan
 # Sprint 4 Deliverables 
 
-For this sprint, the codebase is available in /backend_app directories\n.
-The full website can be accessed [here](https://mlsandbox.streamlit.app/)\n
-\n
-To run the code locally, you need to install uvicorn (pip install uvicorn)\n.
-Run the following: uvicorn backend_app.main:app --reload\n
-Test on: .../docs\n
+For this sprint, the codebase is available in /backend_app directories.
+The full website can be accessed [here](https://mlsandbox.streamlit.app/)
+
+To run the code locally, you need to install uvicorn (pip install uvicorn).
+
+Run the following: uvicorn backend_app.main:app --reload
+
+Test on: .../docs
 
 
 <h3>Database Implementation</h3>
