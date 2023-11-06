@@ -9,8 +9,9 @@ The full website can be accessed [here](https://mlsandbox.streamlit.app/)
 
 <h3>Database Implementation</h3>
 This was implemented using FastAPI, PyDantic, and SQLAlchemy.
-[![image](https://github.com/DevinRS/Capstone_Project/assets/103350414/d19b689e-3b66-447e-8027-16bb19a1a508)
-](https://media.discordapp.net/attachments/1144750919641223330/1170940639421149214/image.png?ex=655ade73&is=65486973&hm=da3fd82c36d501904424682b85fd8c0edc618c1dfd3b56166249b4a73c0b6f2a&=&width=2206&height=1092)https://media.discordapp.net/attachments/1144750919641223330/1170940639421149214/image.png?ex=655ade73&is=65486973&hm=da3fd82c36d501904424682b85fd8c0edc618c1dfd3b56166249b4a73c0b6f2a&=&width=2206&height=1092
+
+![image](https://github.com/DevinRS/Capstone_Project/assets/103350414/3567deb9-92f1-479a-afa8-c09580ab6a26)
+
   
 # Requirement Stack - Sprint 4 
 
