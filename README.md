@@ -15,11 +15,11 @@ Test on: .../docs
 
 
 <h3>Database Implementation</h3>
-This was implemented using FastAPI, PyDantic, and SQLAlchemy.
+These methods were implemented using FastAPI, PyDantic, and SQLAlchemy. FastAPI serves our API endpoints, SQLAlchemy performs our database queries, and PyDantic enforces our JSON types.
 
 ![image](https://github.com/DevinRS/Capstone_Project/assets/103350414/3567deb9-92f1-479a-afa8-c09580ab6a26)
 
-Here is the our Database Schema.
+Here is the our Database Schema. We created 4 tables, 3 of which are connected to the "users" table. The relationship between users and the other tables are one-to-many. 
 
 ![image](https://github.com/DevinRS/Capstone_Project/assets/103350414/f10b4022-e8cb-4ede-80a3-d1965d1fc97b)
 
