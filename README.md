@@ -23,7 +23,7 @@ Here is the our Database Schema. We created 4 tables, 3 of which are connected t
 
 ![image](https://github.com/DevinRS/Capstone_Project/assets/103350414/f10b4022-e8cb-4ede-80a3-d1965d1fc97b)
 
-# Requirement Stack - Sprint 4 
+# Requirement Stack - Sprint 5
 
 ![image](https://github.com/DevinRS/Capstone_Project/assets/103350414/067a62a3-582e-448d-976f-c0b554d067eb)
 
