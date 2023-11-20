@@ -1,3 +1,5 @@
 fastapi
 pydantic
 sqlalchemy
+"python-jose[cryptography]"
+"passlib[bcrypt]"
