@@ -1,0 +1,5 @@
+For this sprint we all work on the backend together as we are unfamiliar with JWT.
+We have successfully implemented the following:
+  1. Password Hashing with HS256 algorithm
+  2. JSON Web Token generation for login endpoint
+  3. Protected endpoint to illustrate that the JWT is working and needed to execute protected endpoints
