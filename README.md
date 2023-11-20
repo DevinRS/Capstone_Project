@@ -4,6 +4,7 @@ EECS581 Capstone Project
 Group Members: Devin, Hubert, Nick, Cody, Tristan
 # Sprint 5 Deliverables 
 
+![image](https://github.com/DevinRS/Capstone_Project/assets/103350414/d620b8e6-8503-4663-9a77-e11485a0c285)
 
 
 # Requirement Stack - Sprint 6
