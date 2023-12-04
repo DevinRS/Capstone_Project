@@ -17,6 +17,9 @@ Here is our JSON implementation of the data that our frontend will send over HTT
 Our updated look for page 3 (Community Cloud):
 ![image](https://github.com/DevinRS/Capstone_Project/assets/90437494/76e01cf3-fbf7-44e6-acc2-905c4e1415d5)
 
+# Sprint 7 Requirements Stack
+![image](https://github.com/DevinRS/Capstone_Project/assets/90437494/010c522e-10fb-494e-8429-23cdb1878b66)
+
 
 
 
