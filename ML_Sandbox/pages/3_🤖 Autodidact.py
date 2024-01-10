@@ -42,6 +42,16 @@ if 'regression_comparison_df' not in st.session_state:
 if 'regression_models' not in st.session_state:
     st.session_state['regression_models'] = None
 
+# Clustering
+if 'clustering_setup' not in st.session_state:
+    st.session_state['clustering_setup'] = None
+
+if 'clustering_comparison_df' not in st.session_state:
+    st.session_state['clustering_comparison_df'] = None
+
+if 'clustering_models' not in st.session_state:
+    st.session_state['clustering_models'] = None
+
 # ----
 # Page Config
 # ----
@@ -768,6 +778,139 @@ if selected == 'Train Model':
                                 pycaret_regression.save_model(model, f'model_0')
                                 # download the model for the user
                                 st.download_button(label='Download Model', data=f'model_0', file_name=f'model_0.pkl')
+
+
+        if problem_type == 'Clustering':
+            st.header('Clustering')
+            # -- Problem Definition --
+            # create a 2 column
+            with st.container(border=True):
+                st.subheader('Problem Definition')
+                col1, col2 = st.columns(2)
+                with col1:
+                    # target_variable selectbox (dataframe columns, cannot be index)
+                    st.selectbox('Target Variable', df.columns, help='Target variable to predict', key='target', disabled=True)
+                with col2:
+                    # Info about clustering
+                    st.info('Clustering does not require a target variable.')
+                    
+                    # button to run setup with all data preprocessing settings
+                    if st.button('Run Setup'):
+                        with st.spinner('Running Setup...'):
+                            # create a new dataframe that uses the key name as columns for the settings
+                            clustering_settings_df = pd.DataFrame({
+                                'preprocess': True,
+                                'imputation_type': [st.session_state['overall_settings'][0][0]],
+                                'numeric_imputation': [st.session_state['overall_settings'][0][1]],
+                                'categorical_imputation': [st.session_state['overall_settings'][0][2]],
+                                'remove_outliers': [st.session_state['overall_settings'][0][6]],
+                                'outliers_method': [st.session_state['overall_settings'][0][7]],
+                                'outliers_threshold': [st.session_state['overall_settings'][0][8]],
+                                'normalize': [st.session_state['overall_settings'][0][9]],
+                                'normalize_method': [st.session_state['overall_settings'][0][10]],
+                                'transformation': [st.session_state['overall_settings'][0][11]],
+                                'transformation_method': [st.session_state['overall_settings'][0][12]],
+                                'polynomial_features': [st.session_state['overall_settings'][0][15]],
+                                'polynomial_degree': [st.session_state['overall_settings'][0][16]],
+                                'bin_numeric_features': [st.session_state['overall_settings'][0][18]],
+                                'remove_multicollinearity': [st.session_state['overall_settings'][0][22]],
+                                'multicollinearity_threshold': [st.session_state['overall_settings'][0][23]],
+                                'low_variance_threshold': [st.session_state['overall_settings'][0][24]],
+                                'pca': [st.session_state['overall_settings'][0][25]],
+                                'pca_method': [st.session_state['overall_settings'][0][26]],
+                                'pca_components': [st.session_state['overall_settings'][0][27]],
+                                'ignore_features': [st.session_state['overall_settings'][0][28]],
+                            })
+
+                            # Run setup and store the output from terminal to a variable
+                            pycaret_clustering.setup(data=df)
+                            setup_df = pycaret_clustering.pull()
+                            st.success('Setup Complete!')
+                            st.session_state['clustering_setup'] = setup_df
+                    # print out the clf configuration
+                    if st.session_state['clustering_setup'] is not None:
+                        st.dataframe(st.session_state['clustering_setup'], use_container_width=True)
+
+
+            # -- Model Training --
+            if st.session_state['clustering_setup'] is not None:
+                # create a 2 column
+                with st.container(border=True):
+                    st.subheader('Model Training')
+                    with st.expander(label='Available Models', expanded=False):
+                        st.write(pycaret_clustering.models())
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        # include multiselect (models to include, default is all models)
+                        st.multiselect('Included Models', pycaret_clustering.models().index.tolist(), help='Models to include in training', key='clustering_include_models', max_selections=1, default=None)
+                        # n_select slider (int) default = 1
+                        st.slider('Number of Models to Select', min_value=1, max_value=5, value=1, step=1, help='Number of models to select and train', key='clustering_n_select', disabled=True)
+                        if st.session_state['clustering_include_models'] == ['kmeans']:
+                            # slider for k (int) default = 4
+                            st.slider('Number of Clusters', min_value=2, max_value=10, value=4, step=1, help='Number of clusters to create', key='k')
+                    with col2:
+                        # create a dataframe that contain the settings for model 
+                        if st.session_state['clustering_include_models'] == ['kmeans']:
+                            model_training_df = pd.DataFrame({
+                                'Included Models': [st.session_state['clustering_include_models']],
+                                'Number of Models to Select': [st.session_state['clustering_n_select']],
+                                'Number of Clusters': [st.session_state['k']]
+                            })
+                        else:
+                            model_training_df = pd.DataFrame({
+                                'Included Models': [st.session_state['clustering_include_models']],
+                                'Number of Models to Select': [st.session_state['clustering_n_select']]
+                            })
+                        # transpose the dataframe
+                        model_training_df = model_training_df.T
+                        # display the dataframe
+                        st.dataframe(model_training_df, use_container_width=True)
+                        # button to run compare_models
+                        if st.button('Run Training'):
+                            with st.spinner('Training...'):
+                                if st.session_state['clustering_include_models'] == ['kmeans']:
+                                    classification_models = pycaret_clustering.create_model(st.session_state['clustering_include_models'][0], num_clusters=st.session_state['k'])
+                                else:
+                                    classification_models = pycaret_clustering.create_model(st.session_state['clustering_include_models'][0])
+                                st.success('Training Complete!')
+                                # print out the comparison
+                                comparison_df = pycaret_clustering.pull()
+                                st.session_state['clustering_comparison_df'] = comparison_df
+                                st.session_state['clustering_models'] = classification_models
+
+                        if st.session_state['clustering_comparison_df'] is not None:
+                            st.dataframe(st.session_state['clustering_comparison_df'], use_container_width=True)
+
+
+            # -- Model Overview --
+            if st.session_state['clustering_models'] is not None:
+                with st.container(border=True):
+                    st.subheader('Model Overview')
+                    st.write(f'Model: {st.session_state["clustering_models"]}')
+                    st.dataframe(pycaret_clustering.assign_model(st.session_state['clustering_models']))
+                    #extract the first 6 letters of the model name
+                    clustering_model_name = f'{st.session_state["clustering_models"]}'
+                    clustering_model_name = clustering_model_name[:6]
+                    if clustering_model_name == 'KMeans':
+                        elbow_plot = pycaret_clustering.plot_model(st.session_state['clustering_models'], plot='elbow', display_format='streamlit', save=True)
+                        st.image(elbow_plot)
+
+
+            # -- Model Download --
+            if st.session_state['clustering_models'] is not None:
+                with st.container(border=True):
+                    st.subheader('Model Download')
+                    model = st.session_state['clustering_models']
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        st.write(f'Model 0: {model}')
+                    with col2:
+                        if st.button('Generate Download Link', key=f'download_link_0'):
+                            # create a temporary file to store the model
+                            pycaret_clustering.save_model(model, f'model_0')
+                            # download the model for the user
+                            st.download_button(label='Download Model', data=f'model_0', file_name=f'model_0.pkl')
+
 
 
 
