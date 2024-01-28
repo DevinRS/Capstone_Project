@@ -1,10 +1,23 @@
 import streamlit as st
 import pandas as pd
 from streamlit_option_menu import option_menu
+import hydralit_components as hc
 
-import pycaret.classification as pycaret_classification
-import pycaret.regression as pycaret_regression
-import pycaret.clustering as pycaret_clustering
+# ----
+# Page Config
+# ----
+st.set_page_config(
+    page_title='Train a Model!',
+    page_icon='📊',
+    layout="wide",
+    initial_sidebar_state='auto',
+    menu_items=None
+)
+
+with hc.HyLoader('Loading Autodidact',hc.Loaders.standard_loaders,index=5):
+    import pycaret.classification as pycaret_classification
+    import pycaret.regression as pycaret_regression
+    import pycaret.clustering as pycaret_clustering
 
 # ----
 # Definition and Globals
@@ -52,16 +65,6 @@ if 'clustering_comparison_df' not in st.session_state:
 if 'clustering_models' not in st.session_state:
     st.session_state['clustering_models'] = None
 
-# ----
-# Page Config
-# ----
-st.set_page_config(
-    page_title='Train a Model!',
-    page_icon='📊',
-    layout="wide",
-    initial_sidebar_state='auto',
-    menu_items=None
-)
 
 # ----
 # Topbar

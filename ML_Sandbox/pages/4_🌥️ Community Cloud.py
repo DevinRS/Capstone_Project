@@ -1,15 +1,7 @@
 import string
 import streamlit as st
 from streamlit_option_menu import option_menu
-import pickle
-from sqlalchemy import create_engine, Column, Integer, String, DateTime
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.types import PickleType
-import datetime
-import base64
-import streamlit.components.v1 as components
-import json
+import hydralit_components as hc
 
 # ----
 # Page Config
@@ -21,6 +13,17 @@ st.set_page_config(
     initial_sidebar_state='auto',
     menu_items=None
 )
+
+with hc.HyLoader('Loading Community Cloud',hc.Loaders.standard_loaders,index=5):
+    import pickle
+    from sqlalchemy import create_engine, Column, Integer, String, DateTime
+    from sqlalchemy.ext.declarative import declarative_base
+    from sqlalchemy.orm import sessionmaker
+    from sqlalchemy.types import PickleType
+    import datetime
+    import base64
+    import streamlit.components.v1 as components
+    import json
 
 # ----
 # Defining the database objects
@@ -66,7 +69,7 @@ title_css = """
     .page-title {
         font-size: 50px;
         font-weight: bold;
-        color: black;
+        color: white;
         text-align: center;
         margin-top: 20px;
     }
