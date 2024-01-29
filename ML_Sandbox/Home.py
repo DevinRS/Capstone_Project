@@ -12,7 +12,7 @@ from email.mime.text import MIMEText
 # Helper Functions
 # ----
 sender_email = 'mlsandboxproject@gmail.com'
-sender_password = 'ubdp ibcf ohms unol'
+sender_password = '###'
 def send_email(body, to, subject):
     try:
         msg = MIMEText(body, 'html')
