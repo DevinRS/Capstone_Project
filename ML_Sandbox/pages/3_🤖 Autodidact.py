@@ -2,13 +2,15 @@ import streamlit as st
 import pandas as pd
 from streamlit_option_menu import option_menu
 import hydralit_components as hc
+import pickle
+import io
 
 # ----
 # Page Config
 # ----
 st.set_page_config(
     page_title='Train a Model!',
-    page_icon='📊',
+    page_icon='🚀',
     layout="wide",
     initial_sidebar_state='auto',
     menu_items=None
@@ -72,8 +74,26 @@ if 'clustering_models' not in st.session_state:
 selected = option_menu(
     menu_title= "Autodidact",
     options=['Upload' , 'Data Preprocessing', 'Train Model', 'Run Model'],
-    orientation="horizontal"
+    orientation="horizontal",
+    menu_icon="robot",
 )
+
+if 'authentication_status' not in st.session_state:
+    st.session_state['authentication_status'] = None
+
+if st.session_state['authentication_status'] is not True:
+    st.warning('You are not logged in! Please login to access this page.')
+    st.stop()
+
+# ----
+# Sidebar
+# ----
+with st.sidebar:
+    try:
+        file_name = 'profilepic_files/' + st.session_state['username'] + '_pic.png'
+        st.image(file_name, use_column_width=True)
+    except Exception as e:
+        st.image('profilepic_files/default_avatar.jpg', use_column_width=True)  
 
 # ----
 # Body
@@ -626,10 +646,13 @@ if selected == 'Train Model':
                                 st.write(f'Model {i}: {model}')
                             with col2:
                                 if st.button('Generate Download Link', key=f'download_link_{i}'):
+                                    file_name = 'temp_files/' + st.session_state['username'] + '_model_' + str(i)
                                     # create a temporary file to store the model
-                                    pycaret_classification.save_model(model, f'model_{i}')
+                                    pycaret_classification.save_model(model, file_name)
+                                    with open(file_name + '.pkl', 'rb') as f:
+                                        model_data = io.BytesIO(f.read())
                                     # download the model for the user
-                                    st.download_button(label='Download Model', data=f'model_{i}', file_name=f'model_{i}.pkl')
+                                    st.download_button(label='Download Model', data=model_data, file_name='model.pkl')
                             i += 1
                     else:
                         model = st.session_state['classification_models']
@@ -638,10 +661,13 @@ if selected == 'Train Model':
                             st.write(f'Model 0: {model}')
                         with col2:
                             if st.button('Generate Download Link', key=f'download_link_0'):
+                                file_name = 'temp_files/' + st.session_state['username'] + '_model_0'
                                 # create a temporary file to store the model
-                                pycaret_classification.save_model(model, f'model_0')
+                                pycaret_classification.save_model(model, file_name)
+                                with open(file_name + '.pkl', 'rb') as f:
+                                    model_data = io.BytesIO(f.read())
                                 # download the model for the user
-                                st.download_button(label='Download Model', data=f'model_0', file_name=f'model_0.pkl')
+                                st.download_button(label='Download Model', data=model_data, file_name='model.pkl')
 
         
         if problem_type == 'Regression':
@@ -765,10 +791,13 @@ if selected == 'Train Model':
                                 st.write(f'Model {i}: {model}')
                             with col2:
                                 if st.button('Generate Download Link', key=f'download_link_{i}'):
+                                    file_name = 'temp_files/' + st.session_state['username'] + '_model_' + str(i)
                                     # create a temporary file to store the model
-                                    pycaret_regression.save_model(model, f'model_{i}')
+                                    pycaret_regression.save_model(model, file_name)
+                                    with open(file_name + '.pkl', 'rb') as f:
+                                        model_data = io.BytesIO(f.read())
                                     # download the model for the user
-                                    st.download_button(label='Download Model', data=f'model_{i}', file_name=f'model_{i}.pkl')
+                                    st.download_button(label='Download Model', data=model_data, file_name='model.pkl')
                             i += 1
                     else:
                         model = st.session_state['regression_models']
@@ -777,10 +806,13 @@ if selected == 'Train Model':
                             st.write(f'Model 0: {model}')
                         with col2:
                             if st.button('Generate Download Link', key=f'download_link_0'):
+                                file_name = 'temp_files/' + st.session_state['username'] + '_model_' + str(i)
                                 # create a temporary file to store the model
-                                pycaret_regression.save_model(model, f'model_0')
+                                pycaret_regression.save_model(model, file_name)
+                                with open(file_name + '.pkl', 'rb') as f:
+                                        model_data = io.BytesIO(f.read())
                                 # download the model for the user
-                                st.download_button(label='Download Model', data=f'model_0', file_name=f'model_0.pkl')
+                                st.download_button(label='Download Model', data=model_data, file_name='model.pkl')
 
 
         if problem_type == 'Clustering':
@@ -909,16 +941,50 @@ if selected == 'Train Model':
                         st.write(f'Model 0: {model}')
                     with col2:
                         if st.button('Generate Download Link', key=f'download_link_0'):
+                            file_name = 'temp_files/' + st.session_state['username'] + '_model_0'
                             # create a temporary file to store the model
-                            pycaret_clustering.save_model(model, f'model_0')
+                            pycaret_clustering.save_model(model, file_name)
+                            with open(file_name + '.pkl', 'rb') as f:
+                                model_data = io.BytesIO(f.read())
                             # download the model for the user
-                            st.download_button(label='Download Model', data=f'model_0', file_name=f'model_0.pkl')
+                            st.download_button(label='Download Model', data=model_data, file_name='model.pkl')
 
 
 
 
 if selected == 'Run Model':
     st.header('Run Model')
+    inference_type = st.selectbox('Select Inference Type', ['Classification', 'Regression', 'Clustering'])
+    inference_model = st.file_uploader('Choose a .pkl model', type=['pkl'])
+    inference_input = st.file_uploader('Choose a .csv file', type=['csv'])
+
+    if inference_model is not None and inference_input is not None:
+        file_name = 'temp_files/' + st.session_state['username'] + '_model'
+        # save the model to a temporary file
+        with open(file_name + '.pkl', 'wb') as f:      
+            f.write(inference_model.getvalue())
+
+        input_df = pd.read_csv(inference_input)
+        if inference_type == 'Classification':
+            model = pycaret_classification.load_model(file_name)
+            # make predictions
+            predictions = pycaret_classification.predict_model(model, data=input_df)
+            # display the predictions
+            st.dataframe(predictions, use_container_width=True)
+        elif inference_type == 'Regression':
+            model = pycaret_classification.load_model(file_name)
+            # make predictions
+            predictions = pycaret_regression.predict_model(model, data=input_df)
+            # display the predictions
+            st.dataframe(predictions, use_container_width=True)
+        elif inference_type == 'Clustering':
+            model = pycaret_classification.load_model(file_name)
+            try:
+                predictions = pycaret_clustering.predict_model(model, data=input_df)
+            except:
+                predictions = pycaret_clustering.assign_model(model)
+            # display the predictions
+            st.dataframe(predictions, use_container_width=True)
 
 
 # ----

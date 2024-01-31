@@ -369,7 +369,7 @@ def tutorial_section():
 # ----
 st.set_page_config(
     page_title='Make Your Graphs!',
-    page_icon='📊',
+    page_icon='🚀',
     layout="wide",
     initial_sidebar_state='auto',
     menu_items=None
@@ -381,8 +381,25 @@ st.set_page_config(
 selected = option_menu(
     menu_title= "Pathfinder",
     options=['Upload', 'Graph Generator', 'Data Explorer','Download'],
-    orientation="horizontal"
+    orientation="horizontal",
+    menu_icon="compass",
 )
+if 'authentication_status' not in st.session_state:
+    st.session_state['authentication_status'] = None
+
+if st.session_state['authentication_status'] is not True:
+    st.warning('You are not logged in! Please login to access this page.')
+    st.stop()
+
+# ----
+# Sidebar
+# ----
+with st.sidebar:
+    try:
+        file_name = 'profilepic_files/' + st.session_state['username'] + '_pic.png'
+        st.image(file_name, use_column_width=True)
+    except Exception as e:
+        st.image('profilepic_files/default_avatar.jpg', use_column_width=True)  
 
 # ----
 # Body

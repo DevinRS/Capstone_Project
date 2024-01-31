@@ -8,7 +8,7 @@ import hydralit_components as hc
 # ----
 st.set_page_config(
     page_title='Explore the Community!',
-    page_icon='📊',
+    page_icon='🚀',
     layout="wide",
     initial_sidebar_state='auto',
     menu_items=None
@@ -24,6 +24,33 @@ with hc.HyLoader('Loading Community Cloud',hc.Loaders.standard_loaders,index=5):
     import base64
     import streamlit.components.v1 as components
     import json
+
+# ----
+# Topbar
+# ----
+selected = option_menu(
+    menu_title= "Community Cloud",
+    options=[''],
+    orientation="horizontal",
+    menu_icon="cloud-sun",
+)
+
+if 'authentication_status' not in st.session_state:
+    st.session_state['authentication_status'] = None
+
+if st.session_state['authentication_status'] is not True:
+    st.warning('You are not logged in! Please login to access this page.')
+    st.stop()
+
+# ----
+# Sidebar
+# ----
+with st.sidebar:
+    try:
+        file_name = 'profilepic_files/' + st.session_state['username'] + '_pic.png'
+        st.image(file_name, use_column_width=True)
+    except Exception as e:
+        st.image('profilepic_files/default_avatar.jpg', use_column_width=True)  
 
 # ----
 # Defining the database objects

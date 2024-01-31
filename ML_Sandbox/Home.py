@@ -1,5 +1,5 @@
 import streamlit as st
-from PIL import Image
+from PIL import Image, ImageOps
 from streamlit_option_menu import option_menu
 import streamlit_authenticator as stauth
 import yaml
@@ -7,12 +7,13 @@ from yaml.loader import SafeLoader
 
 import smtplib
 from email.mime.text import MIMEText
+import os
 
 # ----
 # Helper Functions
 # ----
 sender_email = 'mlsandboxproject@gmail.com'
-sender_password = '###'
+sender_password = st.secrets['email_password']
 def send_email(body, to, subject):
     try:
         msg = MIMEText(body, 'html')
@@ -35,10 +36,17 @@ def send_email(body, to, subject):
 # ----
 st.set_page_config(
     page_title='ML SandBox!',
+    page_icon='🚀',
     layout="wide",
     initial_sidebar_state='auto',
     menu_items=None
 )
+
+# ----
+# Sidebar
+# ----
+
+        
 
 # ----
 # Topbar
@@ -70,6 +78,14 @@ if selected == 'Login':
     name, authentication_status, username = authenticator.login()
 
     if st.session_state["authentication_status"]:
+        # Sidebar
+        with st.sidebar:
+            try:
+                file_name = 'profilepic_files/' + st.session_state['username'] + '_pic.png'
+                st.image(file_name, use_column_width=True)
+            except Exception as e:
+                st.image('profilepic_files/default_avatar.jpg', use_column_width=True)  
+
         col1, col2 = st.columns([2, 1])
         with col1:
             st.title(f'Welcome, *:orange[{st.session_state["name"]}]*')
@@ -98,6 +114,26 @@ if selected == 'Login':
                             yaml.dump(users, file, default_flow_style=False)
                 except Exception as e:
                     st.error(e)
+        with st.expander('Edit Profile Picture'):
+            if st.session_state["authentication_status"]:
+                if 'profile_updated' not in st.session_state:
+                    st.session_state['profile_updated'] = False
+                profile_pic = st.file_uploader('Upload a new profile picture', type=['png', 'jpg', 'jpeg'], key='profile_picture')
+                if profile_pic and not st.session_state['profile_updated']:
+                    # convert to png using PIL
+                    image = Image.open(st.session_state['profile_picture'])
+                    # convert to 200x200
+                    image = image.resize((200, 200))
+                    image.save(file_name)
+                    st.success('Profile picture updated successfully, refresh the page to see the changes')
+                if st.button('Reset Profile Picture'):
+                    try:
+                        os.remove(file_name)
+                        st.success('Profile picture reset successfully, refresh the page to see the changes')
+                    except Exception as e:
+                        st.error('Profile picture is already default')
+
+
         authenticator.logout('Logout', 'main')
     elif st.session_state["authentication_status"] is False:
         st.error('Username/password is incorrect')
@@ -105,6 +141,14 @@ if selected == 'Login':
         st.warning('Please enter your username and password')
 
 elif selected == 'Create Account':
+    if st.session_state["authentication_status"]:
+        # Sidebar
+        with st.sidebar:
+            try:
+                file_name = 'profilepic_files/' + st.session_state['username'] + '_pic.png'
+                st.image(file_name, use_column_width=True)
+            except Exception as e:
+                st.image('profilepic_files/default_avatar.jpg', use_column_width=True) 
     try:
         if authenticator.register_user(preauthorization=False):
             st.success('User registered successfully')
@@ -114,6 +158,14 @@ elif selected == 'Create Account':
         st.error(e)
 
 elif selected == 'Forgot Password':
+    if st.session_state["authentication_status"]:
+        # Sidebar
+        with st.sidebar:
+            try:
+                file_name = 'profilepic_files/' + st.session_state['username'] + '_pic.png'
+                st.image(file_name, use_column_width=True)
+            except Exception as e:
+                st.image('profilepic_files/default_avatar.jpg', use_column_width=True) 
     try:
         username_of_forgotten_password, email_of_forgotten_password, new_random_password = authenticator.forgot_password()
         if username_of_forgotten_password:
@@ -136,6 +188,14 @@ MLSandbox Team
         st.error(e)
 
 elif selected == 'Forgot Username':
+    if st.session_state["authentication_status"]:
+        # Sidebar
+        with st.sidebar:
+            try:
+                file_name = 'profilepic_files/' + st.session_state['username'] + '_pic.png'
+                st.image(file_name, use_column_width=True)
+            except Exception as e:
+                st.image('profilepic_files/default_avatar.jpg', use_column_width=True) 
     try:
         username_of_forgotten_username, email_of_forgotten_username = authenticator.forgot_username()
         if username_of_forgotten_username:
