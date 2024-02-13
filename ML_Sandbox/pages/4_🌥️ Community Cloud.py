@@ -4,6 +4,7 @@ from streamlit_option_menu import option_menu
 import hydralit_components as hc
 import yaml
 from yaml.loader import SafeLoader
+import requests
 
 
 # ----
@@ -109,43 +110,57 @@ st.markdown('<p class="page-title">Community Cloud</p>', unsafe_allow_html=True)
 st.divider()
 st.header('Create a Post', anchor=None)
 
-with open('users.yaml') as f:
-    users = yaml.load(f, Loader=SafeLoader)
+# Create a post
+with st.form(key="uploadModelForm", clear_on_submit=True):
+    post_owner = st.session_state['username']
     
-    # Create a post
-    with st.form(key="uploadModelForm", clear_on_submit=True):
-        post_owner = st.session_state['username']
-        
-        modelName = st.text_input(label='Model Name:')
-        modelDescription = st.text_area(label='Short Description of Model', 
-                                        placeholder='e.g.  probabilistic machine learning algorithm')
-        modelLongDesc = st.text_area(label='Detailed Description of Model', 
-                                    placeholder='e.g. Naïve Bayes is a probabilistic machine learning algorithm used for many classification functions and is based on the Bayes theorem. Gaussian Naïve Bayes is the extension of naïve Bayes. While other functions are used to estimate data distribution, Gaussian or normal distribution is the simplest to implement as you will need to calculate the mean and standard deviation for the training data.')
-        modelItem = st.file_uploader(label='Upload Model', type = ['pkl', 'pickle'], key = 'model_file')
-        modelNumLikes = 0
-        modelNumDislikes = 0
-        uploadButton = st.form_submit_button(label='Upload Your Post')
-        modelTime = datetime.datetime.now().strftime('%m/%d/%Y')
-        if (uploadButton == True):
-            if (len(modelName) == 0):
-                st.warning('Please enter a model name')
-            else:
-                existing_model = session.query(Models).filter(Models.MLname == modelName).first()
+    modelName = st.text_input(label='Model Name:')
+    modelDescription = st.text_area(label='Short Description of Model', 
+                                    placeholder='e.g.  probabilistic machine learning algorithm')
+    modelLongDesc = st.text_area(label='Detailed Description of Model', 
+                                placeholder='e.g. Naïve Bayes is a probabilistic machine learning algorithm used for many classification functions and is based on the Bayes theorem. Gaussian Naïve Bayes is the extension of naïve Bayes. While other functions are used to estimate data distribution, Gaussian or normal distribution is the simplest to implement as you will need to calculate the mean and standard deviation for the training data.')
+    modelItem = st.file_uploader(label='Upload Model', type = ['pkl', 'pickle'], key = 'model_file')
+    modelNumLikes = 0
+    modelNumDislikes = 0
+    uploadButton = st.form_submit_button(label='Upload Your Post')
+    modelTime = datetime.datetime.now().strftime('%m/%d/%Y')
+    if (uploadButton == True):
+        if (len(modelName) == 0):
+            st.warning('Please enter a model name')
+        else:
+            existing_model = session.query(Models).filter(Models.MLname == modelName).first()
 
-                if existing_model:
-                    st.warning(f'Model name "{modelName}" already exists. Please choose a different name')
+            if existing_model:
+                st.warning(f'Model name "{modelName}" already exists. Please choose a different name')
+            else:
+                if modelItem == None:
+                    st.warning('Please upload a file for your model.')
                 else:
-                    if modelItem == None:
-                        st.warning('Please upload a file for your model.')
-                    else:
-                        
-                        
-                        model = Models(modelName, post_owner, modelDescription, modelLongDesc, modelItem, modelNumLikes, modelNumDislikes, modelTime) 
-                        session.add(model)
-                        session.commit()
-                        
-                        st.success(f'Model "{modelItem.name}" has been successfully uploaded!')
+                    # model = Models(modelName, post_owner, modelDescription, modelLongDesc, modelItem, modelNumLikes, modelNumDislikes, modelTime) 
+                    # session.add(model)
+                    # session.commit()
+                    
+                    # st.success(f'Model "{modelItem.name}" has been successfully uploaded!')
+                    # st.rerun()
+
+                    # Send a request to the API instead of directly adding to the database. API is hosted locally on port 8000. Ignore file upload for now
+                    url = 'http://localhost:8000/posts/'
+                    data = {
+                        "MLname": modelName,
+                        "post_owner": post_owner,
+                        "description": modelDescription,
+                        "longDescription": modelLongDesc,
+                        "numLikes": modelNumLikes,
+                        "numDislikes": modelNumDislikes,
+                        "uploadTime": modelTime
+                    }
+                    response = requests.post(url, json=data)
+                    if response.status_code == 200:
+                        st.success(f'Model "{modelName}" has been successfully uploaded!')
                         st.rerun()
+                    else:
+                        st.error(f'Failed to upload model. Please try again later.')
+
         
     
     
@@ -157,22 +172,32 @@ if (clearModels):
     st.success('All models have been deleted')
 
 
-def display_models():
-    models = session.query(Models).all()
+# def display_models():
+    # models = session.query(Models).all()
 
-    if not models:
-        st.info("No Models bitch")
+    # if not models:
+    #     st.info("No Models bitch")
     
-    else:
-        for model in models:
-            st.subheader(model.MLname)
-            st.write(f"Post id: {model.post_id}")
-            st.write(f"Uploaded by: {model.post_owner}")
-            st.write(f"Description: {model.description}")
-            st.write(f"Detailed Description: {model.longDescription}")
-            st.write(f"Number of Likes: {model.numLikes}")
-            st.write(f"Number of Dislikes: {model.numDislikes}")
-            st.write(f"Upload Time: {model.uploadTime}")
-            st.markdown("---")
+    # else:
+    #     for model in models:
+    #         st.subheader(model.MLname)
+    #         st.write(f"Post id: {model.post_id}")
+    #         st.write(f"Uploaded by: {model.post_owner}")
+    #         st.write(f"Description: {model.description}")
+    #         st.write(f"Detailed Description: {model.longDescription}")
+    #         st.write(f"Number of Likes: {model.numLikes}")
+    #         st.write(f"Number of Dislikes: {model.numDislikes}")
+    #         st.write(f"Upload Time: {model.uploadTime}")
+    #         st.markdown("---")
 
-display_models()
+    # Use API calls instead
+    
+
+
+#get all ML models
+getModels = st.button('Get Models', key='getModels', type='primary')
+if (getModels):
+    url = 'http://localhost:8000/posts/'
+    response = requests.get(url)
+    st.write(response)
+
