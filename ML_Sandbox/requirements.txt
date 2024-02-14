@@ -8,3 +8,6 @@ hydralit-components
 sqlalchemy
 faker
 plotly
+fastapi
+uvicorn
+pydantic

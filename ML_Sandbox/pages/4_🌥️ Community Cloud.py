@@ -5,6 +5,9 @@ import hydralit_components as hc
 import yaml
 from yaml.loader import SafeLoader
 import requests
+from PIL import Image
+import io
+import os
 
 
 # ----
@@ -49,68 +52,12 @@ with st.sidebar:
         st.image('profilepic_files/default_avatar.jpg', use_column_width=True)  
 
 # ----
-# Defining the database objects
-# ----
-Base = declarative_base()
-class Models(Base):
-    #set table name and columns
-    post_id = Column(Integer, primary_key=True, autoincrement=True)
-    __tablename__ = "posts"
-    MLname = Column("name", String)
-    post_owner = Column("owner", String)
-    description = Column("description", String)
-    longDescription = Column("longDesc", String)
-    item = Column("item", PickleType)
-    numLikes = Column("likes", Integer)
-    numDislikes = Column("dislikes", Integer)
-    uploadTime = Column("date", String)
-
-    def __init__ (self, MLname, post_owner, description, longDescription, item, numLikes, numDislikes, uploadTime):
-        self.MLname = MLname
-        self.post_owner = post_owner
-        self.description = description
-        self.longDescription = longDescription
-        self.item = item
-        self.numLikes = numLikes
-        self.numDislikes = numDislikes
-        self.uploadTime = uploadTime
-    
-    def __repr__ (self):   
-            return f"{self.MLname}, {self.description}, {self.longDescription}, {self.item}, {self.numLikes}, {self.numDislikes}, {self.uploadTime}"
-
-
-engine = create_engine("sqlite:///file_uploads.db")
-Base.metadata.create_all(bind=engine)
-
-Session = sessionmaker(bind=engine)
-session = Session()
-
-
-# ----
 # Title of the Page
 # ----
 
-title_css = """
-<style>
-    .page-title {
-        font-size: 50px;
-        font-weight: bold;
-        color: white;
-        text-align: center;
-        margin-top: 20px;
-    }
-</style>
-"""
-
-
-st.markdown(title_css, unsafe_allow_html=True)
-
-
-st.markdown('<p class="page-title">Community Cloud</p>', unsafe_allow_html=True)
-st.divider()
-st.header('Create a Post', anchor=None)
-
-# Create a post
+# ----
+# Create a new post
+# ----
 with st.form(key="uploadModelForm", clear_on_submit=True):
     post_owner = st.session_state['username']
     
@@ -127,77 +74,85 @@ with st.form(key="uploadModelForm", clear_on_submit=True):
     if (uploadButton == True):
         if (len(modelName) == 0):
             st.warning('Please enter a model name')
+        elif (modelItem == None):
+            st.warning('Please upload a file for your model.')
         else:
-            existing_model = session.query(Models).filter(Models.MLname == modelName).first()
+            # Send a request to the API instead of directly adding to the database. API is hosted locally on port 8000. Ignore file upload for now
+            url = 'http://localhost:8000/posts/'
+            data = {
+                "MLname": modelName,
+                "post_owner": post_owner,
+                "description": modelDescription,
+                "longDescription": modelLongDesc,
+                "numLikes": modelNumLikes,
+                "numDislikes": modelNumDislikes,
+                "uploadTime": modelTime
+            }
+            response = requests.post(url, json=data)
+            if response.status_code == 200:
+                st.write(response.json().get('post_id'))
+                post_id = response.json().get('post_id')
+                filename = 'postmodel_files/' + (str)(post_id) + '_model.pkl'
+                with open(filename, 'wb') as f:
+                    f.write(modelItem.getvalue())
 
-            if existing_model:
-                st.warning(f'Model name "{modelName}" already exists. Please choose a different name')
+                st.success(f'Model "{modelName}" has been successfully uploaded!')
             else:
-                if modelItem == None:
-                    st.warning('Please upload a file for your model.')
-                else:
-                    # model = Models(modelName, post_owner, modelDescription, modelLongDesc, modelItem, modelNumLikes, modelNumDislikes, modelTime) 
-                    # session.add(model)
-                    # session.commit()
-                    
-                    # st.success(f'Model "{modelItem.name}" has been successfully uploaded!')
-                    # st.rerun()
-
-                    # Send a request to the API instead of directly adding to the database. API is hosted locally on port 8000. Ignore file upload for now
-                    url = 'http://localhost:8000/posts/'
-                    data = {
-                        "MLname": modelName,
-                        "post_owner": post_owner,
-                        "description": modelDescription,
-                        "longDescription": modelLongDesc,
-                        "numLikes": modelNumLikes,
-                        "numDislikes": modelNumDislikes,
-                        "uploadTime": modelTime
-                    }
-                    response = requests.post(url, json=data)
-                    if response.status_code == 200:
-                        st.success(f'Model "{modelName}" has been successfully uploaded!')
-                        st.rerun()
-                    else:
-                        st.error(f'Failed to upload model. Please try again later.')
+                st.error(f'Failed to upload model. Please try again later.')
+                # get the response content details only
+                st.error(response.json().get('detail'))
 
         
-    
-    
-#clears all ML models
-clearModels = st.button('clear Models', key='clearModels', type='primary')
-if (clearModels):
-    session.query(Models).delete()
-    session.commit()
-    st.success('All models have been deleted')
 
-
-# def display_models():
-    # models = session.query(Models).all()
-
-    # if not models:
-    #     st.info("No Models bitch")
-    
-    # else:
-    #     for model in models:
-    #         st.subheader(model.MLname)
-    #         st.write(f"Post id: {model.post_id}")
-    #         st.write(f"Uploaded by: {model.post_owner}")
-    #         st.write(f"Description: {model.description}")
-    #         st.write(f"Detailed Description: {model.longDescription}")
-    #         st.write(f"Number of Likes: {model.numLikes}")
-    #         st.write(f"Number of Dislikes: {model.numDislikes}")
-    #         st.write(f"Upload Time: {model.uploadTime}")
-    #         st.markdown("---")
-
-    # Use API calls instead
-    
-
-
-#get all ML models
-getModels = st.button('Get Models', key='getModels', type='primary')
-if (getModels):
+# ----
+# Get Posts
+# ----
+with hc.HyLoader('Loading Posts',hc.Loaders.standard_loaders,index=5):
     url = 'http://localhost:8000/posts/'
     response = requests.get(url)
-    st.write(response)
+
+    for model in response.json():
+        with st.container(border=1):
+            col1, col2, col3= st.columns([1, 10, 1])
+            with col1:
+                try:
+                    pimage = Image.open('profilepic_files/' + model['post_owner'] + '_pic.png')
+                    st.image(pimage, use_column_width=True)
+                except:
+                    st.image('profilepic_files/default_avatar.jpg', use_column_width=True)
+                st.write(model['numLikes'])
+                st.write(model['numDislikes'])
+            with col2:
+                st.write(model['post_owner'] + ', ' + model['uploadTime'])
+                st.title(model['MLname'])
+                st.write(model['description'])
+                with st.expander('View More'):
+                    st.write(model['longDescription'])
+            with col3:
+                try:
+                    file_name = 'postmodel_files/' + (str)(model['post_id']) + '_model'
+                    with open(file_name + '.pkl', 'rb') as f:
+                        model_data = io.BytesIO(f.read())
+                    st.download_button(label='Download', data=model_data, file_name=model['MLname'] + '.pkl',use_container_width=True)
+                except:
+                    st.warning('No Model')
+                # Check if the post is owned by the user, if it is, show the delete button
+                if (model['post_owner'] == st.session_state['username']):
+                    st.button('Delete', key=model['MLname'] + '_delete', use_container_width=True)
+                    if st.session_state[model['MLname'] + '_delete']:
+                        url = 'http://localhost:8000/posts/' + str(model['post_id'])
+                        response = requests.delete(url)
+                        if response.status_code == 200:
+                            # Delete the model file
+                            filename = 'postmodel_files/' + (str)(model['post_id']) + '_model.pkl'
+                            try:
+                                os.remove(filename)
+                            except:
+                                pass
+                            st.rerun()
+                        else:
+                            st.error(f'Failed to delete model. Please try again later.')
+                            # get the response content details only
+                            st.error(response.json().get('detail'))
+            
 

@@ -4,6 +4,11 @@ cookie:
   name: random_cookie_name
 credentials:
   usernames:
+    devinsetiawan:
+      email: test@gmail.com
+      logged_in: false
+      name: Devin Setiawan
+      password: $2b$12$ev/IeosRtRzHQMEHNCner.SFNZ0ofI4LaSjnv4BaGE4acAxoe/o.q
     jsmith:
       email: jsmith@gmail.com
       logged_in: false
