@@ -79,9 +79,15 @@ app = fastapi.FastAPI()
 async def create_post(post: PostCreate):
     # Convert the Pydantic model to a SQLAlchemy model
     post = Models(MLname=post.MLname, post_owner=post.post_owner, description=post.description, longDescription=post.longDescription, numLikes=post.numLikes, numDislikes=post.numDislikes, uploadTime=post.uploadTime)
-    session.add(post)
-    session.commit()
-    return post
+
+    # Check if MLname already exists, if it does, raise an error message
+    if session.query(Models).filter(Models.MLname == post.MLname).first() is not None:
+        raise fastapi.HTTPException(status_code=400, detail="Model with this name already exists")
+    else:
+        session.add(post)
+        session.commit()
+        # return the post_id
+        return {"post_id": post.post_id}
 
 @app.get("/posts/")
 async def read_posts():
