@@ -2,11 +2,11 @@
 EECS581 Capstone Project
 
 Group Members: Devin, Hubert, Nick, Cody, Tristan
-# Sprint 7 Deliverables 
-For this sprint, we connected the user authentication backend and frontend. For this goal, we also completed our home page that serves the capabilities for user authentication such as login, create account, forgot password, forgot username, edit profile, etc. We unfortunately were not able to finish the rest of the linking, specifically the community cloud page. Next, we optimize our app by removing ydata-profiling library and create a similar functionality from the ground up to increase speed. For processes that can't be speed up, we added a loader animation for the user. We moved the profiling functionality to the pathfinder page and keep the autodidact page only for training and deployment of models for accessibility.
+# Sprint 9 Deliverables 
+For this sprint, we updated our database to add the necessary tables for our like and dislike features in the third page. In addition to that, we also implemented some API endpoints in FastAPI that makes these features possible. We have yet to link the front and backend of our websites for the like and dislike features, but it will be done next sprint. Aside from like and dislike, we also implemented our merit system for users, where a post gives you one merit, a like gives you anoter, and a dislike subtracts one. All of these actions have been included in our FastAPI.
 
-Here is the home page of our app when user is logged in
-![image](https://media.discordapp.net/attachments/1144750919641223330/1201362231175172176/image.png?ex=65c98ac4&is=65b715c4&hm=94c8bfe53af21a33c1c5b4182920f9cf9a604863b4ce5c993146943e9da66acd&=&format=webp&quality=lossless&width=1106&height=520)
+Here are our new FastAPI endpoints:
+![image](https://github.com/DevinRS/Capstone_Project/assets/103350414/56d696b2-9418-48a7-8ec6-1b8697d9690c)
 
 Here is the email that was sent for "Forgot Username" functionality. It was sent through the app ("Forgot Password" has the same format)
 ![image](https://media.discordapp.net/attachments/1144750919641223330/1201360976969224302/image0.jpg?ex=65c98999&is=65b71499&hm=364d40d2c833813288c3f9e02c0c565645eac1de77bfa502abc528a1fee42274&=&format=webp&width=303&height=595)
