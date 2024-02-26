@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, Integer, String, DateTime
+from sqlalchemy import create_engine, Column, Integer, String, DateTime, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.types import PickleType
@@ -20,17 +20,17 @@ Base = declarative_base()
 class LikeDislikeTable(Base):
     __tablename__ = "likeDislikeTable"
     likeDislike_id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column("user_id", Integer)
+    owner_name = Column("owner_name", String)
     post_id = Column("post_id", Integer)
     likeOrDislike = Column("likeOrDislike", Boolean)
 
-    def __init__ (self, user_id, post_id, likeOrDislike):
-        self.user_id = user_id
+    def __init__ (self, owner_name, post_id, likeOrDislike):
+        self.owner_name = owner_name
         self.post_id = post_id
         self.likeOrDislike = likeOrDislike
 
     def __repr__ (self):
-        return f"{self.user_id}, {self.post_id}, {self.likeOrDislike}"
+        return f"{self.owner_name}, {self.post_id}, {self.likeOrDislike}"
 
 
 class Models(Base):
@@ -83,10 +83,21 @@ class Post(PostBase):
 # ----
 # Defining the Pydantic models for LikeDislike table
 # ----
-class PostBase(BaseModel):
-    user_id: int
+class LikeDislikeBase(BaseModel):
+    owner_name: str
     post_id: int
     likeOrDislike: bool
+
+class LikeDislikeCreate(LikeDislikeBase):
+    pass
+
+class LikeDislike(LikeDislikeBase):
+    likeDislike_id: int
+
+    class Config:
+        orm_mode = True
+
+# ----
 
 
 # Defining the FastAPI app
@@ -135,6 +146,12 @@ async def update_post(post_id: int, post: PostCreate):
 async def delete_post(post_id: int):
     post = session.query(Models).filter(Models.post_id == post_id).first()
     session.delete(post)
+
+    # Delete all likes and dislikes for the post
+    likes_dislikes = session.query(LikeDislikeTable).filter(LikeDislikeTable.post_id == post_id).all()
+    for entry in likes_dislikes:
+        session.delete(entry)
+
     session.commit()
     return post
 
@@ -158,47 +175,83 @@ async def delete_post(post_id: int):
 #   - Sort by User Merit
 
 # Like A Post
-@app.post("/posts/like/{post_id}/{user_id}")
-async def like_post(post_id: int, user_id: int):
-    # Steps:
-    # 1. Check if user_id, post_id pair already exists in the likeDislikeTable
-    # 2. If it does, check if it is a like or dislike
-    # 3. If it is a like, return an error message
-    # 4. If it is a dislike, change it to a like
-    # 5. If it does not exist, add a like to the likeDislikeTable
+@app.post("/like")
+async def like_post(entry: LikeDislikeBase):
+    entry = LikeDislikeTable(owner_name=entry.owner_name, post_id=entry.post_id, likeOrDislike=entry.likeOrDislike)
 
-    pass
-
-# Dislike A Post
-@app.post("/posts/dislike/{post_id}/{user_id}")
-async def dislike_post(post_id: int, user_id: int):
-    pass
-
-# Get Like for a post
-@app.get("/posts/getlike/{post_id}")
+    existing_entry = session.query(LikeDislikeTable).filter(LikeDislikeTable.owner_name == entry.owner_name and LikeDislikeTable.post_id == entry.post_id).first()
+    
+    if existing_entry:
+        existing_entry.likeOrDislike = entry.likeOrDislike
+        session.commit()
+        
+        if entry.likeOrDislike == 1:
+            return {"message": "Post liked"}
+        else:
+            return {"message": "Post disliked"}
+    else:
+        session.add(entry)
+        session.commit()
+        if entry.likeOrDislike == 1:
+            return {"message": "Post liked"}
+        else:
+            return {"message": "Post disliked"}
+        
+# Get like for a post given a post_id
+@app.get("/getlike/{post_id}")
 async def get_like(post_id: int):
-    pass
+    entry_by_id = session.query(LikeDislikeTable).filter(LikeDislikeTable.post_id == post_id).all()
+    like = 0
+    for entry in entry_by_id:
+        if entry.likeOrDislike == 1:
+            like += 1
+    return {"like": like}
 
-# Get Dislike for a post
-@app.get("/posts/getdislike/{post_id}")
+# Get dislike for a post given a post_id
+@app.get("/getdislike/{post_id}")
 async def get_dislike(post_id: int):
-    pass
+    entry_by_id = session.query(LikeDislikeTable).filter(LikeDislikeTable.post_id == post_id).all()
+    dislike = 0
+    for entry in entry_by_id:
+        if entry.likeOrDislike == 0:
+            dislike += 1
+    return {"dislike": dislike}
 
 # Calculate Merit for a user
-@app.get("/posts/calculateusermerit/{user_id}")
-async def calculate_user_merit(user_id: int):
-    pass
+@app.get("/calculateusermerit/{owner_name}")
+async def calculate_user_merit(owner_name: str):
+    merit = 0
+    # get all post by owner_name
+    posts_by_owner = session.query(Models).filter(Models.post_owner == owner_name).all()
+    for post in posts_by_owner:
+        post_id = post.post_id
+        entry_by_id = session.query(LikeDislikeTable).filter(LikeDislikeTable.post_id == post_id).all()
+        for entry in entry_by_id:
+            if entry.likeOrDislike == 1:
+                merit += 1
+            else:
+                merit -= 1
 
-# Sort Queries
-@app.get("/posts/sortbydate/{amount}")
-async def sort_by_date(amount: int):
-    pass
+    # add merit based on how many posts the user has
+    merit += len(posts_by_owner)
 
-@app.get("/posts/sortbylikedislikeratio/{amount}")
-async def sort_by_like_dislike_ratio(amount: int):
-    pass
+    # Find owner_name in likeDislikeTable
+    # For each entry, add 1 merit for leaving a review
+    entries_by_owner = session.query(LikeDislikeTable).filter(LikeDislikeTable.owner_name == owner_name).all()
+    merit += len(entries_by_owner)
 
-@app.get("/posts/sortbyusermerit/{amount}")
-async def sort_by_user_merit(amount: int):
-    pass
+    return {"merit": merit}
+    
+
+# Tester function to print likeDislikeTable
+@app.get("/likeDislikeTable")
+async def read_likeDislikeTable():
+    likeDislikeTable = session.query(LikeDislikeTable).all()
+
+    # Convert SQLAlchemy objects to dictionaries
+    likeDislikeTable_dict = []
+    for entry in likeDislikeTable:
+        likeDislikeTable_dict.append(entry.__dict__)
+
+    return likeDislikeTable_dict
 
