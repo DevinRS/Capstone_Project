@@ -118,3 +118,68 @@ async def delete_post(post_id: int):
     session.delete(post)
     session.commit()
     return post
+
+# ----
+# FUTURE CHANGES
+# ----
+
+# Future DB changes
+# 1. Delete like and dislike columns from the posts table
+# 2. Add a table for likes and dislikes:
+#    likeDislikeTable(user_id, post_id, likeOrDislike[0,1])
+
+
+# Future API endpoints
+# 1. Get like for a post
+# 2. Get dislike for a post
+# 3. Calculate Merit for a user
+# 4. Sort Queries:
+#   - Sort by date
+#   - Sort by Like/Dislike ratio
+#   - Sort by User Merit
+
+# Like A Post
+@app.post("/posts/like/{post_id}/{user_id}")
+async def like_post(post_id: int, user_id: int):
+    # Steps:
+    # 1. Check if user_id, post_id pair already exists in the likeDislikeTable
+    # 2. If it does, check if it is a like or dislike
+    # 3. If it is a like, return an error message
+    # 4. If it is a dislike, change it to a like
+    # 5. If it does not exist, add a like to the likeDislikeTable
+
+    pass
+
+# Dislike A Post
+@app.post("/posts/dislike/{post_id}/{user_id}")
+async def dislike_post(post_id: int, user_id: int):
+    pass
+
+# Get Like for a post
+@app.get("/posts/getlike/{post_id}")
+async def get_like(post_id: int):
+    pass
+
+# Get Dislike for a post
+@app.get("/posts/getdislike/{post_id}")
+async def get_dislike(post_id: int):
+    pass
+
+# Calculate Merit for a user
+@app.get("/posts/calculateusermerit/{user_id}")
+async def calculate_user_merit(user_id: int):
+    pass
+
+# Sort Queries
+@app.get("/posts/sortbydate/{amount}")
+async def sort_by_date(amount: int):
+    pass
+
+@app.get("/posts/sortbylikedislikeratio/{amount}")
+async def sort_by_like_dislike_ratio(amount: int):
+    pass
+
+@app.get("/posts/sortbyusermerit/{amount}")
+async def sort_by_user_merit(amount: int):
+    pass
+
