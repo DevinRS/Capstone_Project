@@ -14,6 +14,24 @@ from pydantic import BaseModel
 
 Base = declarative_base()
 
+# 1. Delete like and dislike columns from the posts table
+# 2. Add a table for likes and dislikes:
+#    likeDislikeTable(user_id, post_id, likeOrDislike[0,1])
+class LikeDislikeTable(Base):
+    __tablename__ = "likeDislikeTable"
+    likeDislike_id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column("user_id", Integer)
+    post_id = Column("post_id", Integer)
+    likeOrDislike = Column("likeOrDislike", Boolean)
+
+    def __init__ (self, user_id, post_id, likeOrDislike):
+        self.user_id = user_id
+        self.post_id = post_id
+        self.likeOrDislike = likeOrDislike
+
+    def __repr__ (self):
+        return f"{self.user_id}, {self.post_id}, {self.likeOrDislike}"
+
 
 class Models(Base):
     #set table name and columns
@@ -23,21 +41,17 @@ class Models(Base):
     post_owner = Column("owner", String)
     description = Column("description", String)
     longDescription = Column("longDesc", String)
-    numLikes = Column("likes", Integer)
-    numDislikes = Column("dislikes", Integer)
     uploadTime = Column("date", String)
 
-    def __init__ (self, MLname, post_owner, description, longDescription, numLikes, numDislikes, uploadTime):
+    def __init__ (self, MLname, post_owner, description, longDescription, uploadTime):
         self.MLname = MLname
         self.post_owner = post_owner
         self.description = description
         self.longDescription = longDescription
-        self.numLikes = numLikes
-        self.numDislikes = numDislikes
         self.uploadTime = uploadTime
     
     def __repr__ (self):   
-        return f"{self.MLname}, {self.description}, {self.longDescription}, {self.numLikes}, {self.numDislikes}, {self.uploadTime}"
+        return f"{self.MLname}, {self.description}, {self.longDescription}, {self.uploadTime}"
         
 # ----
 # Defining the database connection
@@ -55,8 +69,6 @@ class PostBase(BaseModel):
     post_owner: str
     description: str
     longDescription: str
-    numLikes: int
-    numDislikes: int
     uploadTime: str
 
 class PostCreate(PostBase):
@@ -68,6 +80,15 @@ class Post(PostBase):
     class Config:
         orm_mode = True
 
+# ----
+# Defining the Pydantic models for LikeDislike table
+# ----
+class PostBase(BaseModel):
+    user_id: int
+    post_id: int
+    likeOrDislike: bool
+
+
 # Defining the FastAPI app
 # ----
 app = fastapi.FastAPI()
@@ -78,7 +99,7 @@ app = fastapi.FastAPI()
 @app.post("/posts/")
 async def create_post(post: PostCreate):
     # Convert the Pydantic model to a SQLAlchemy model
-    post = Models(MLname=post.MLname, post_owner=post.post_owner, description=post.description, longDescription=post.longDescription, numLikes=post.numLikes, numDislikes=post.numDislikes, uploadTime=post.uploadTime)
+    post = Models(MLname=post.MLname, post_owner=post.post_owner, description=post.description, longDescription=post.longDescription, uploadTime=post.uploadTime)
 
     # Check if MLname already exists, if it does, raise an error message
     if session.query(Models).filter(Models.MLname == post.MLname).first() is not None:
@@ -106,8 +127,6 @@ async def update_post(post_id: int, post: PostCreate):
     post.post_owner = post.post_owner
     post.description = post.description
     post.longDescription = post.longDescription
-    post.numLikes = post.numLikes
-    post.numDislikes = post.numDislikes
     post.uploadTime = post.uploadTime
     session.commit()
     return post
