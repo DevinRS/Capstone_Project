@@ -67,8 +67,6 @@ with st.form(key="uploadModelForm", clear_on_submit=True):
     modelLongDesc = st.text_area(label='Detailed Description of Model', 
                                 placeholder='e.g. Naïve Bayes is a probabilistic machine learning algorithm used for many classification functions and is based on the Bayes theorem. Gaussian Naïve Bayes is the extension of naïve Bayes. While other functions are used to estimate data distribution, Gaussian or normal distribution is the simplest to implement as you will need to calculate the mean and standard deviation for the training data.')
     modelItem = st.file_uploader(label='Upload Model', type = ['pkl', 'pickle'], key = 'model_file')
-    modelNumLikes = 0
-    modelNumDislikes = 0
     uploadButton = st.form_submit_button(label='Upload Your Post')
     modelTime = datetime.datetime.now().strftime('%m/%d/%Y')
     if (uploadButton == True):
@@ -84,8 +82,6 @@ with st.form(key="uploadModelForm", clear_on_submit=True):
                 "post_owner": post_owner,
                 "description": modelDescription,
                 "longDescription": modelLongDesc,
-                "numLikes": modelNumLikes,
-                "numDislikes": modelNumDislikes,
                 "uploadTime": modelTime
             }
             response = requests.post(url, json=data)
