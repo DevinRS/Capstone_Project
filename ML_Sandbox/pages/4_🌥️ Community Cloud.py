@@ -50,6 +50,17 @@ with st.sidebar:
         st.image(file_name, use_column_width=True)
     except Exception as e:
         st.image('profilepic_files/default_avatar.jpg', use_column_width=True)  
+    
+    # Get Merit for the user using API: http://localhost:8000/calculateusermerit/{username}
+    url = 'http://localhost:8000/calculateusermerit/' + st.session_state['username']
+    response = requests.get(url)
+    if response.status_code == 200:
+        st.write('Merit: ' + str(response.json().get('merit')))
+    else:
+        st.error('Failed to get merit. Please try again later.')
+        # get the response content details only
+        st.error(response.json().get('detail'))
+
 
 # ----
 # Title of the Page
@@ -116,8 +127,25 @@ with hc.HyLoader('Loading Posts',hc.Loaders.standard_loaders,index=5):
                     st.image(pimage, use_column_width=True)
                 except:
                     st.image('profilepic_files/default_avatar.jpg', use_column_width=True)
-                st.write(model['numLikes'])
-                st.write(model['numDislikes'])
+                # Get the like count for the post using API: http://localhost:8000/getlike/{post_id}
+                url = 'http://localhost:8000/getlike/' + str(model['post_id'])
+                response = requests.get(url)
+                if response.status_code == 200:
+                    st.write('Likes: ' + str(response.json().get('like')))
+                else:
+                    st.error('Failed to get like count. Please try again later.')
+                    # get the response content details only
+                    st.error(response.json().get('detail'))
+
+                # Get the dislike count for the post using API: http://localhost:8000/getdislike/{post_id}
+                url = 'http://localhost:8000/getdislike/' + str(model['post_id'])
+                response = requests.get(url)
+                if response.status_code == 200:
+                    st.write('Dislikes: ' + str(response.json().get('dislike')))
+                else:
+                    st.error('Failed to get dislike count. Please try again later.')
+                    # get the response content details only
+                    st.error(response.json().get('detail'))
             with col2:
                 st.write(model['post_owner'] + ', ' + model['uploadTime'])
                 st.title(model['MLname'])
@@ -150,5 +178,34 @@ with hc.HyLoader('Loading Posts',hc.Loaders.standard_loaders,index=5):
                             st.error(f'Failed to delete model. Please try again later.')
                             # get the response content details only
                             st.error(response.json().get('detail'))
+
+                # Like and Dislike buttons using API: http://localhost:8000/like/{post_id}/{owner_name}/{likeOrDislike}
+                likeButton = st.button('Like', key=model['MLname'] + '_like', use_container_width=True)
+                if likeButton:
+                    url = 'http://localhost:8000/like/' + str(model['post_id']) + '/' + st.session_state['username'] + '/1'
+                    response = requests.post(url)
+                    if response.status_code == 200:
+                        st.rerun()
+                    else:
+                        st.error(f'Failed to like model. Please try again later.')
+                        # get the response content details only
+                        st.error(response.json().get('detail'))
+
+                dislikeButton = st.button('Dislike', key=model['MLname'] + '_dislike', use_container_width=True)
+                if dislikeButton:
+                    url = 'http://localhost:8000/like/' + str(model['post_id']) + '/' + st.session_state['username'] + '/0'
+                    response = requests.post(url)
+                    if response.status_code == 200:
+                        st.rerun()
+                    else:
+                        st.error(f'Failed to dislike model. Please try again later.')
+                        # get the response content details only
+                        st.error(response.json().get('detail'))
+
+                        
+
+                
+
+
             
 
