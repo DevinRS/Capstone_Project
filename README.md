@@ -2,14 +2,22 @@
 EECS581 Capstone Project
 
 Group Members: Devin, Hubert, Nick, Cody, Tristan
-# Sprint 9 Deliverables 
-For this sprint, we updated our database to add the necessary tables for our like and dislike features in the third page. In addition to that, we also implemented some API endpoints in FastAPI that makes these features possible. We have yet to link the front and backend of our websites for the like and dislike features, but it will be done next sprint. Aside from like and dislike, we also implemented our merit system for users, where a post gives you one merit, a like gives you anoter, and a dislike subtracts one. All of these actions have been included in our FastAPI.
+# Sprint 10 Deliverables 
+In this sprint, significant progress has been made as the backend and frontend components have been successfully connected. This crucial integration marks a milestone in the development process, ensuring seamless communication between the server-side logic and the user interface. With this connection established, data flows seamlessly between the backend and frontend, enabling a cohesive and responsive user experience. Developers can now leverage the combined power of both components to create a robust and efficient application. For detailed instructions and additional information, please refer to the documentation provided in this README on GitHub.
 
-Here are our new FastAPI endpoints, as well as our previously existing ones:
-![image](https://github.com/DevinRS/Capstone_Project/assets/103350414/56d696b2-9418-48a7-8ec6-1b8697d9690c)
+Here's our like/dislike frontend component
+![image](https://github.com/DevinRS/Capstone_Project/assets/90437494/5efa0589-a81b-4df2-9834-f4b674c49897)
 
-Requirement stack for next sprint:
-![image](https://github.com/DevinRS/Capstone_Project/assets/103350414/f6d8217c-888a-433b-8cb9-800c4bea27dd)
+Here's the backend counterpart showing each like and dislike relationship:
+![image](https://github.com/DevinRS/Capstone_Project/assets/90437494/46229bb3-da8a-4a94-80da-e7caa5df509e)
+
+Here's the Merit system on the sidebar:
+![image](https://github.com/DevinRS/Capstone_Project/assets/90437494/0df9d0e9-2e18-45db-9f4b-8724ba06d6f2)
+
+Here's the backend counterpart:
+![image](https://github.com/DevinRS/Capstone_Project/assets/90437494/462e2cef-5243-4d18-a676-5d5e79ac87a3)
+
+
 
 
 
