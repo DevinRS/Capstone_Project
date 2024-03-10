@@ -175,28 +175,21 @@ async def delete_post(post_id: int):
 #   - Sort by User Merit
 
 # Like A Post
-@app.post("/like")
-async def like_post(entry: LikeDislikeBase):
-    entry = LikeDislikeTable(owner_name=entry.owner_name, post_id=entry.post_id, likeOrDislike=entry.likeOrDislike)
-
-    existing_entry = session.query(LikeDislikeTable).filter(LikeDislikeTable.owner_name == entry.owner_name and LikeDislikeTable.post_id == entry.post_id).first()
+@app.post("/like/{post_id}/{owner_name}/{likeOrDislike}")
+async def like_post(post_id: int, owner_name: str, likeOrDislike: int):
+    # check if the owner_name has already liked or disliked the post, if already exists, update the likeOrDislike
+    entry_by_id = session.query(LikeDislikeTable).filter(LikeDislikeTable.post_id == post_id).filter(LikeDislikeTable.owner_name == owner_name).first()
+    if entry_by_id is not None:
+        entry_by_id.likeOrDislike = likeOrDislike
+        session.commit()
+        return entry_by_id
     
-    if existing_entry:
-        existing_entry.likeOrDislike = entry.likeOrDislike
-        session.commit()
-        
-        if entry.likeOrDislike == 1:
-            return {"message": "Post liked"}
-        else:
-            return {"message": "Post disliked"}
-    else:
-        session.add(entry)
-        session.commit()
-        if entry.likeOrDislike == 1:
-            return {"message": "Post liked"}
-        else:
-            return {"message": "Post disliked"}
-        
+    # if the owner_name has not liked or disliked the post, create a new entry
+    entry = LikeDislikeTable(owner_name=owner_name, post_id=post_id, likeOrDislike=likeOrDislike)
+    session.add(entry)
+    session.commit()
+    return entry
+
 # Get like for a post given a post_id
 @app.get("/getlike/{post_id}")
 async def get_like(post_id: int):
