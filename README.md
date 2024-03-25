@@ -2,11 +2,11 @@
 EECS581 Capstone Project
 
 Group Members: Devin, Hubert, Nick, Cody, Tristan
-# Sprint 10 Deliverables 
-In this sprint, significant progress has been made as the backend and frontend components have been successfully connected. This crucial integration marks a milestone in the development process, ensuring seamless communication between the server-side logic and the user interface. With this connection established, data flows seamlessly between the backend and frontend, enabling a cohesive and responsive user experience. Developers can now leverage the combined power of both components to create a robust and efficient application. For detailed instructions and additional information, please refer to the documentation provided in this README on GitHub.
+# Sprint 11 Deliverables 
+In this sprint, some of the component in the community cloud has been updated for a more improved UI. The like/dislike icons are added to the like/dislike counter. Added new buttons for sorting feature which include "sort by date", "sort by name", "sort by popularity".
 
 ## Here's our like/dislike frontend component:
-![image](https://github.com/DevinRS/Capstone_Project/assets/90437494/5efa0589-a81b-4df2-9834-f4b674c49897)
+![image](https://github.com/DevinRS/Capstone_Project/assets/90437494/4312849c-1db3-44ff-8bce-e225d737be60)
 
 ## Here's the backend counterpart showing each like and dislike relationship:
 ![image](https://github.com/DevinRS/Capstone_Project/assets/90437494/46229bb3-da8a-4a94-80da-e7caa5df509e)
