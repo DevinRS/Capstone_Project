@@ -2,19 +2,26 @@
 EECS581 Capstone Project
 
 Group Members: Devin, Hubert, Nick, Cody, Tristan
-# Sprint 11 Deliverables 
-In this sprint, some of the component in the community cloud has been updated for a more improved UI. The like/dislike icons are added to the like/dislike counter. Added new buttons for sorting feature which include "sort by date", "sort by name", "sort by popularity".
+# Sprint 12 Deliverables 
+In this sprint, we have updated the way we structured our database to denormalize it. In addition to that, we have added some sroting options in our community cloud. Users can now sort the community posts by date, name, and popularity. 
 
-## Here's our like/dislike frontend component:
-![image](https://github.com/DevinRS/Capstone_Project/assets/90437494/4312849c-1db3-44ff-8bce-e225d737be60)
+## Here is an example of sorting by date:
+![image](https://github.com/DevinRS/Capstone_Project/assets/103350414/765f4888-17f0-47fa-ac1a-51159a528892)
 
-## Here's the backend counterpart showing each like and dislike relationship:
-![image](https://github.com/DevinRS/Capstone_Project/assets/90437494/46229bb3-da8a-4a94-80da-e7caa5df509e)
+## Here is an example of sorting by name:
+![image](https://github.com/DevinRS/Capstone_Project/assets/103350414/deadcd14-a383-4c76-a97f-8656551c982e)
 
-## Here's the Merit system on the sidebar:
-![image](https://github.com/DevinRS/Capstone_Project/assets/90437494/0df9d0e9-2e18-45db-9f4b-8724ba06d6f2)
+## Here is an example of sorting by popularity
+## Date:
+![image](https://github.com/DevinRS/Capstone_Project/assets/103350414/05ebb3da-e1fb-4cf7-a289-c81a55ae13c0)
 
-## Here's the backend counterpart:
+## Name:
+![image](https://github.com/DevinRS/Capstone_Project/assets/103350414/d9c8716d-6f1f-42b5-a975-0a762827752d)
+
+## Popularity
+![image](https://github.com/DevinRS/Capstone_Project/assets/103350414/3c21a1f1-7605-402c-b63d-bf30f5640b81)
+
+## The following images are the implementations in our backend for each sorting elements:
 ![image](https://github.com/DevinRS/Capstone_Project/assets/90437494/462e2cef-5243-4d18-a676-5d5e79ac87a3)
 
 
