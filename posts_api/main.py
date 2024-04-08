@@ -311,8 +311,8 @@ async def read_posts_denormalized_sorted_by_ratio():
                 post_dict["dislike"] += 1
         posts_denormalized.append(post_dict)
 
-    # sort by like/dislike ratio
-    posts_denormalized.sort(key=lambda x: x["like"]/(x["like"] + x["dislike"]), reverse=True)
+    # sort by like/dislike ratio, if both are 0, set the ratio to 0
+    posts_denormalized.sort(key=lambda x: x["like"]/(x["like"] + x["dislike"]) if x["like"] + x["dislike"] != 0 else 0, reverse=True)
     return posts_denormalized
 
 # Tester function to print likeDislikeTable
