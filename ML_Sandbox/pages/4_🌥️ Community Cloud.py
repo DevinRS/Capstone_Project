@@ -122,94 +122,81 @@ selected = option_menu(
 # ----
 # Get Posts
 # ----
-if selected == 'Sort By Date':
-    with hc.HyLoader('Loading Posts',hc.Loaders.standard_loaders,index=5):
-        url = 'http://localhost:8000/posts/'
-        response = requests.get(url)
+with hc.HyLoader('Loading Posts',hc.Loaders.standard_loaders,index=5):
+    if selected == 'Sort By Date':
+        url = 'http://localhost:8000/postsdenormalizedsortedbydate/'
+    elif selected == 'Sort By Name':
+        url = 'http://localhost:8000/postsdenormalizedsortedbyname/'
+    elif selected == 'Sort By Popularity':
+        url = 'http://localhost:8000/postsdenormalizedsortedbyratio/'
+    response = requests.get(url)
 
-        for model in response.json():
-            with st.container(border=1):
-                col1, col2, col3= st.columns([1, 10, 1])
-                with col1:
-                    try:
-                        pimage = Image.open('profilepic_files/' + model['post_owner'] + '_pic.png')
-                        st.image(pimage, use_column_width=True)
-                    except:
-                        st.image('profilepic_files/default_avatar.jpg', use_column_width=True)
-                    # Get the like count for the post using API: http://localhost:8000/getlike/{post_id}
-                    url = 'http://localhost:8000/getlike/' + str(model['post_id'])
-                    response = requests.get(url)
-                    if response.status_code == 200:
-                        st.write('👍: ' + str(response.json().get('like')))
-                    else:
-                        st.error('Failed to get like count. Please try again later.')
-                        # get the response content details only
-                        st.error(response.json().get('detail'))
-
-                    # Get the dislike count for the post using API: http://localhost:8000/getdislike/{post_id}
-                    url = 'http://localhost:8000/getdislike/' + str(model['post_id'])
-                    response = requests.get(url)
-                    if response.status_code == 200:
-                        st.write('👎: ' + str(response.json().get('dislike')))
-                    else:
-                        st.error('Failed to get dislike count. Please try again later.')
-                        # get the response content details only
-                        st.error(response.json().get('detail'))
-                with col2:
-                    st.write(model['post_owner'] + ', ' + model['uploadTime'])
-                    st.title(model['MLname'])
-                    st.write(model['description'])
-                    with st.expander('View More'):
-                        st.write(model['longDescription'])
-                with col3:
-                    try:
-                        file_name = 'postmodel_files/' + (str)(model['post_id']) + '_model'
-                        with open(file_name + '.pkl', 'rb') as f:
-                            model_data = io.BytesIO(f.read())
-                        st.download_button(label='Download', data=model_data, file_name=model['MLname'] + '.pkl',use_container_width=True)
-                    except:
-                        st.warning('No Model')
-                    # Check if the post is owned by the user, if it is, show the delete button
-                    if (model['post_owner'] == st.session_state['username']):
-                        st.button('Delete', key=model['MLname'] + '_delete', use_container_width=True)
-                        if st.session_state[model['MLname'] + '_delete']:
-                            url = 'http://localhost:8000/posts/' + str(model['post_id'])
-                            response = requests.delete(url)
-                            if response.status_code == 200:
-                                # Delete the model file
-                                filename = 'postmodel_files/' + (str)(model['post_id']) + '_model.pkl'
-                                try:
-                                    os.remove(filename)
-                                except:
-                                    pass
-                                st.rerun()
-                            else:
-                                st.error(f'Failed to delete model. Please try again later.')
-                                # get the response content details only
-                                st.error(response.json().get('detail'))
-
-                    # Like and Dislike buttons using API: http://localhost:8000/like/{post_id}/{owner_name}/{likeOrDislike}
-                    likeButton = st.button('Like', key=model['MLname'] + '_like', use_container_width=True)
-                    if likeButton:
-                        url = 'http://localhost:8000/like/' + str(model['post_id']) + '/' + st.session_state['username'] + '/1'
-                        response = requests.post(url)
+    for model in response.json():
+        with st.container(border=1):
+            col1, col2, col3= st.columns([1, 10, 1])
+            with col1:
+                try:
+                    pimage = Image.open('profilepic_files/' + model['post_owner'] + '_pic.png')
+                    st.image(pimage, use_column_width=True)
+                except:
+                    st.image('profilepic_files/default_avatar.jpg', use_column_width=True)
+                st.write('👍: ' + str(model['like']))
+                st.write('👎: ' + str(model['dislike']))
+            with col2:
+                st.write(model['post_owner'] + ', ' + model['uploadTime'])
+                st.title(model['MLname'])
+                st.write(model['description'])
+                with st.expander('View More'):
+                    st.write(model['longDescription'])
+            with col3:
+                try:
+                    file_name = 'postmodel_files/' + (str)(model['post_id']) + '_model'
+                    with open(file_name + '.pkl', 'rb') as f:
+                        model_data = io.BytesIO(f.read())
+                    st.download_button(label='Download', data=model_data, file_name=model['MLname'] + '.pkl',use_container_width=True)
+                except:
+                    st.warning('No Model')
+                # Check if the post is owned by the user, if it is, show the delete button
+                if (model['post_owner'] == st.session_state['username']):
+                    st.button('Delete', key=model['MLname'] + '_delete', use_container_width=True)
+                    if st.session_state[model['MLname'] + '_delete']:
+                        url = 'http://localhost:8000/posts/' + str(model['post_id'])
+                        response = requests.delete(url)
                         if response.status_code == 200:
+                            # Delete the model file
+                            filename = 'postmodel_files/' + (str)(model['post_id']) + '_model.pkl'
+                            try:
+                                os.remove(filename)
+                            except:
+                                pass
                             st.rerun()
                         else:
-                            st.error(f'Failed to like model. Please try again later.')
+                            st.error(f'Failed to delete model. Please try again later.')
                             # get the response content details only
                             st.error(response.json().get('detail'))
 
-                    dislikeButton = st.button('Dislike', key=model['MLname'] + '_dislike', use_container_width=True)
-                    if dislikeButton:
-                        url = 'http://localhost:8000/like/' + str(model['post_id']) + '/' + st.session_state['username'] + '/0'
-                        response = requests.post(url)
-                        if response.status_code == 200:
-                            st.rerun()
-                        else:
-                            st.error(f'Failed to dislike model. Please try again later.')
-                            # get the response content details only
-                            st.error(response.json().get('detail'))
+                # Like and Dislike buttons using API: http://localhost:8000/like/{post_id}/{owner_name}/{likeOrDislike}
+                likeButton = st.button('Like', key=model['MLname'] + '_like', use_container_width=True)
+                if likeButton:
+                    url = 'http://localhost:8000/like/' + str(model['post_id']) + '/' + st.session_state['username'] + '/1'
+                    response = requests.post(url)
+                    if response.status_code == 200:
+                        st.rerun()
+                    else:
+                        st.error(f'Failed to like model. Please try again later.')
+                        # get the response content details only
+                        st.error(response.json().get('detail'))
+
+                dislikeButton = st.button('Dislike', key=model['MLname'] + '_dislike', use_container_width=True)
+                if dislikeButton:
+                    url = 'http://localhost:8000/like/' + str(model['post_id']) + '/' + st.session_state['username'] + '/0'
+                    response = requests.post(url)
+                    if response.status_code == 200:
+                        st.rerun()
+                    else:
+                        st.error(f'Failed to dislike model. Please try again later.')
+                        # get the response content details only
+                        st.error(response.json().get('detail'))
 
                         
 
