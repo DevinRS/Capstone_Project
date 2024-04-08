@@ -236,6 +236,85 @@ async def calculate_user_merit(owner_name: str):
     return {"merit": merit}
     
 
+# New Endpoint to get POSTS after denormalization which contains like and dislike count
+@app.get("/postsdenormalized/")
+async def read_posts_denormalized():
+    posts = session.query(Models).all()
+    posts_denormalized = []
+    for post in posts:
+        post_dict = post.__dict__
+        post_id = post_dict["post_id"]
+        post_dict["like"] = 0
+        post_dict["dislike"] = 0
+        entries_by_id = session.query(LikeDislikeTable).filter(LikeDislikeTable.post_id == post_id).all()
+        for entry in entries_by_id:
+            if entry.likeOrDislike == 1:
+                post_dict["like"] += 1
+            else:
+                post_dict["dislike"] += 1
+        posts_denormalized.append(post_dict)
+    return posts_denormalized
+
+# get denormalized post sorted by date, newest first
+@app.get("/postsdenormalizedsortedbydate/")
+async def read_posts_denormalized_sorted_by_date():
+    posts = session.query(Models).order_by(Models.uploadTime.desc()).all()
+    posts_denormalized = []
+    for post in posts:
+        post_dict = post.__dict__
+        post_id = post_dict["post_id"]
+        post_dict["like"] = 0
+        post_dict["dislike"] = 0
+        entries_by_id = session.query(LikeDislikeTable).filter(LikeDislikeTable.post_id == post_id).all()
+        for entry in entries_by_id:
+            if entry.likeOrDislike == 1:
+                post_dict["like"] += 1
+            else:
+                post_dict["dislike"] += 1
+        posts_denormalized.append(post_dict)
+    return posts_denormalized
+
+# get denormalized post sorted by model name
+@app.get("/postsdenormalizedsortedbyname/")
+async def read_posts_denormalized_sorted_by_name():
+    posts = session.query(Models).order_by(Models.MLname).all()
+    posts_denormalized = []
+    for post in posts:
+        post_dict = post.__dict__
+        post_id = post_dict["post_id"]
+        post_dict["like"] = 0
+        post_dict["dislike"] = 0
+        entries_by_id = session.query(LikeDislikeTable).filter(LikeDislikeTable.post_id == post_id).all()
+        for entry in entries_by_id:
+            if entry.likeOrDislike == 1:
+                post_dict["like"] += 1
+            else:
+                post_dict["dislike"] += 1
+        posts_denormalized.append(post_dict)
+    return posts_denormalized
+
+# get denormalized post sorted by like/dislike ratio
+@app.get("/postsdenormalizedsortedbyratio/")
+async def read_posts_denormalized_sorted_by_ratio():
+    posts = session.query(Models).all()
+    posts_denormalized = []
+    for post in posts:
+        post_dict = post.__dict__
+        post_id = post_dict["post_id"]
+        post_dict["like"] = 0
+        post_dict["dislike"] = 0
+        entries_by_id = session.query(LikeDislikeTable).filter(LikeDislikeTable.post_id == post_id).all()
+        for entry in entries_by_id:
+            if entry.likeOrDislike == 1:
+                post_dict["like"] += 1
+            else:
+                post_dict["dislike"] += 1
+        posts_denormalized.append(post_dict)
+
+    # sort by like/dislike ratio
+    posts_denormalized.sort(key=lambda x: x["like"]/(x["like"] + x["dislike"]), reverse=True)
+    return posts_denormalized
+
 # Tester function to print likeDislikeTable
 @app.get("/likeDislikeTable")
 async def read_likeDislikeTable():
