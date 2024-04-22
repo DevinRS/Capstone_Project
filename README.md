@@ -2,28 +2,18 @@
 EECS581 Capstone Project
 
 Group Members: Devin, Hubert, Nick, Cody, Tristan
-# Sprint 12 Deliverables 
-In this sprint, we have updated the way we structured our database to denormalize it. In addition to that, we have added some sroting options in our community cloud. Users can now sort the community posts by date, name, and popularity. 
+# Sprint 13 Deliverables (Last Sprint!) 
+In this final sprint, we added some fun features to our website. We included a text box that checks for any keywords that will trigger some fun visual effects. Also, we implemented a simple yet fun minigame in the sidebar if the user inputs the right trigger word. The game we chose to implement is Tic Tac Toe, where you can play against an AI. This minigame has a score counter, difficulty option, and light/dark mode. 
+## Here is a screenshot of one of the trigger words, "snow"
+![image](https://github.com/DevinRS/Capstone_Project/assets/103350414/632d1cf4-3354-422f-9a11-c59c10e02af6)
 
-## Here is an example of sorting by date:
-![image](https://github.com/DevinRS/Capstone_Project/assets/103350414/765f4888-17f0-47fa-ac1a-51159a528892)
+## Here is a screenshot of the minigame on our sidebar
+![image](https://github.com/DevinRS/Capstone_Project/assets/103350414/23213673-884e-42ae-aa4e-643de3c54635)
 
-## Here is an example of sorting by name:
-![image](https://github.com/DevinRS/Capstone_Project/assets/103350414/deadcd14-a383-4c76-a97f-8656551c982e)
+## Here is the implementation of the minigame which appears when a user types "iwannaplaygame" in the text box
+![image](https://github.com/DevinRS/Capstone_Project/assets/103350414/732a64b5-1a80-4b43-aa5b-7bc99db97ffa)
 
-## Here is an example of sorting by popularity
-![image](https://github.com/DevinRS/Capstone_Project/assets/103350414/bd180c07-2649-41c4-8661-d0749a8f854e)
-
-## The following images are the implementations in our backend for each sorting elements:
-## Date:
-![image](https://github.com/DevinRS/Capstone_Project/assets/103350414/05ebb3da-e1fb-4cf7-a289-c81a55ae13c0)
-
-## Name:
-![image](https://github.com/DevinRS/Capstone_Project/assets/103350414/d9c8716d-6f1f-42b5-a975-0a762827752d)
-
-## Popularity
-![image](https://github.com/DevinRS/Capstone_Project/assets/103350414/3c21a1f1-7605-402c-b63d-bf30f5640b81)
-
+With that, we conclude our Capstone project. Thank you!
 
 
 
