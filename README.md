@@ -10,7 +10,7 @@ In this final sprint, we added some fun features to our website. We included a t
 ## Here is a screenshot of the minigame on our sidebar
 ![image](https://github.com/DevinRS/Capstone_Project/assets/103350414/23213673-884e-42ae-aa4e-643de3c54635)
 
-## Here is the implementation of the minigame which appears when a user types "iwannaplaygame" in the text box
+## Here is the implementation of the minigame and the special effects
 ![image](https://github.com/DevinRS/Capstone_Project/assets/103350414/732a64b5-1a80-4b43-aa5b-7bc99db97ffa)
 
 With that, we conclude our Capstone project. Thank you!
