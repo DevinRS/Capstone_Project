@@ -9,6 +9,8 @@ import smtplib
 from email.mime.text import MIMEText
 import os
 
+from streamlit.components.v1 import html
+
 # ----
 # Helper Functions
 # ----
@@ -45,8 +47,8 @@ st.set_page_config(
 # ----
 # Sidebar
 # ----
-
-        
+    
+    
 
 # ----
 # Topbar
@@ -214,6 +216,20 @@ MLSandbox Team
             st.error('Email not found')
     except Exception as e:
         st.error(e)
+
+
+on = st.toggle('Experimental Features')
+if on:
+    text_input = st.text_input(' ')
+    if text_input == 'balloons' or text_input == 'balloon':
+        st.balloons()
+    if text_input == 'snow':
+        st.snow()
+    if text_input == 'iwannaplaygame':
+        html_str = "<iframe src=\"https://solitaires-online.com/tic-tac-toe/#id=416pwfdn3s,no-nav,no-article,no-feedback,no-ads\" title=\"Tic-Tac-Toe game\" width=\"280\" height=\"280\"></iframe>"
+        with st.sidebar:
+            html(html_str, width=280, height=280)
+
 
  
 
